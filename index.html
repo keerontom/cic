@@ -595,10 +595,11 @@
         }
 
         /* payment scaled by per-period inflation growth */
-        function scaledPmt(base, inflPP, periodIndex) {
-            if (!inflAdj || inflPP === 0) return base;
-            return base * Math.pow(1 + inflPP, periodIndex);
-        }
+       function scaledPmt(base, inflPP, periodIndex) {
+    // Positive = contribution (fixed by design); only inflate withdrawals
+    if (!inflAdj || inflPP === 0 || base >= 0) return base;
+    return base * Math.pow(1 + inflPP, periodIndex);
+}
 
         function updatePurchaseYearOptions(selectedYear) {
             var t   = parseInt(document.getElementById("duration").value) || 1;
