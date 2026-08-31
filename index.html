@@ -1238,7 +1238,7 @@
                 var totInt = rows.reduce(function(a,r){return a+r.yInt;},0);
                 var isWdr  = (d.addSign||1)===-1;
                 var totalInc = rawNum(d.qpp)+rawNum(d.oas)+rawNum(d.pension);
-                html+='<div class="print-scenario'+(idx<SCENARIOS.length-1?' print-break":""')+'">';
+                html+='<div class="print-scenario'+(idx<SCENARIOS.length-1?' print-break':'')+'">';
                 html+='<div class="print-scenario-header" style="background:'+PRINT_HDR_COLORS[s]+'">'+SCENARIO_LABELS[s]+'</div>';
                 html+='<table class="print-summary-table"><tbody>';
                 html+='<tr><td>Starting Balance</td><td>'+fmt(first.opening)+'</td><td>Interest Rate</td><td>'+d.rate+'%</td></tr>';
