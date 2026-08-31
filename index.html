@@ -168,23 +168,24 @@
         .scenario-bar {
     position: fixed;
     bottom: 0; left: 0; right: 0;
-    height: calc(28px + constant(safe-area-inset-bottom));
-    height: calc(28px + env(safe-area-inset-bottom));
     display: flex;
+    height: auto;  /* let content + padding define the height */
+    padding-bottom: constant(safe-area-inset-bottom);
+    padding-bottom: env(safe-area-inset-bottom);
     box-shadow: 0 -2px 8px rgba(0,0,0,.12);
     z-index: 100;
 }
         .scenario-btn {
-            flex: 1;
-            border: none;
-            font-size: 9px;
-            font-weight: 700;
-            letter-spacing: 0.01em;
-            cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
-            padding-bottom: constant(safe-area-inset-bottom);
-            padding-bottom: env(safe-area-inset-bottom);
-        }
+    flex: 1;
+    height: 28px;  /* button strip is exactly 28px — same as action bar */
+    border: none;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    /* padding-bottom removed — the bar handles safe area now */
+}
         .scenario-btn[data-scenario="working"]    { background: #c8d8e8; color: #2c5f8a; }
         .scenario-btn[data-scenario="bridge"]     { background: #c8e8d0; color: #2c6b45; }
         .scenario-btn[data-scenario="bridge2"]    { background: #c8e8e4; color: #2a6b68; }
