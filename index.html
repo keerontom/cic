@@ -149,10 +149,12 @@
         }
         /* ── ACTION BAR ── */
         .action-bar {
-            display: flex;
-            height: 28px;
-            flex-shrink: 0;
-        }
+    display: flex;
+    height: 28px;
+    flex-shrink: 0;
+    padding-bottom: constant(safe-area-inset-bottom);
+    padding-bottom: env(safe-area-inset-bottom);
+}
         .action-bar-btn {
             flex: 1;
             border: none;
@@ -168,11 +170,10 @@
         .action-bar-btn.pdf-btn   { background: #e2e8f0; color: #2d3748; }
         /* ── BOTTOM SCENARIO BAR ── */
         .scenario-bar {
-            display: flex;
-            flex-shrink: 0;
-            padding-bottom: constant(safe-area-inset-bottom);
-            padding-bottom: env(safe-area-inset-bottom);
-        }
+    display: flex;
+    flex-shrink: 0;
+    /* no padding-bottom here anymore */
+}
         .scenario-btn {
             flex: 1;
             height: 28px;
@@ -680,17 +681,17 @@
     </div>
     <!-- ── BOTTOM BARS — in normal flow, no fixed positioning ── -->
     <div class="bottom-bars">
-        <div class="action-bar">
-            <button class="action-bar-btn chart-btn" onclick="openChartModal()">📊&nbsp; Chart</button>
-            <button class="action-bar-btn pdf-btn"   onclick="exportPDF()">📄&nbsp; Export PDF</button>
-        </div>
-        <div class="scenario-bar">
-            <button data-scenario="working"    class="scenario-btn active" onclick="switchScenario('working')">Working</button>
-            <button data-scenario="bridge"     class="scenario-btn"        onclick="switchScenario('bridge')">Bridge 1</button>
-            <button data-scenario="bridge2"    class="scenario-btn"        onclick="switchScenario('bridge2')">Bridge 2</button>
-            <button data-scenario="retirement" class="scenario-btn"        onclick="switchScenario('retirement')">Retirement</button>
-        </div>
+    <div class="scenario-bar">
+        <button data-scenario="working"    class="scenario-btn active" onclick="switchScenario('working')">Working</button>
+        <button data-scenario="bridge"     class="scenario-btn"        onclick="switchScenario('bridge')">Bridge 1</button>
+        <button data-scenario="bridge2"    class="scenario-btn"        onclick="switchScenario('bridge2')">Bridge 2</button>
+        <button data-scenario="retirement" class="scenario-btn"        onclick="switchScenario('retirement')">Retirement</button>
     </div>
+    <div class="action-bar">
+        <button class="action-bar-btn chart-btn" onclick="openChartModal()">📊&nbsp; Chart</button>
+        <button class="action-bar-btn pdf-btn"   onclick="exportPDF()">📄&nbsp; Export PDF</button>
+    </div>
+</div>
 </div>
 <!-- CHART MODAL -->
 <div id="chart-modal" class="chart-modal hidden">
