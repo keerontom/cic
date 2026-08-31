@@ -24,15 +24,14 @@
             overscroll-behavior: none;
         }
         .hidden { display: none !important; }
-              .wrapper {
+        .wrapper {
             display: flex;
             flex-direction: column;
             width: 100%;
             height: 100%;
             gap: 4px;
             overflow: hidden;
-            padding-bottom: calc(56px + constant(safe-area-inset-bottom));
-            padding-bottom: calc(56px + env(safe-area-inset-bottom));
+            /* no padding-bottom — bottom-bars are in the flow now */
         }
         .app-title {
             text-align: center;
@@ -140,17 +139,20 @@
         .right-col.ending { font-weight: 600; }
         .ledger-table tfoot td { padding: 6px 10px; border-top: 2px solid #4a5568; font-weight: 700; font-size: 12px; }
         .ledger-table tfoot td:first-child { text-align: left; color: #4a5568; }
+        /* ── BOTTOM BARS CONTAINER — in normal flow, no fixed positioning ── */
+        .bottom-bars {
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            margin: 0 -10px; /* bleed to body edges */
+            box-shadow: 0 -2px 8px rgba(0,0,0,.12);
+        }
         /* ── ACTION BAR ── */
         .action-bar {
-    position: fixed;
-    bottom: calc(28px + constant(safe-area-inset-bottom));
-    bottom: calc(28px + env(safe-area-inset-bottom));
-    left: 0; right: 0;
-    height: 28px;
-    display: flex;
-    z-index: 99;
-    box-shadow: 0 -1px 5px rgba(0,0,0,.10);
-}
+            display: flex;
+            height: 28px;
+            flex-shrink: 0;
+        }
         .action-bar-btn {
             flex: 1;
             border: none;
@@ -166,26 +168,21 @@
         .action-bar-btn.pdf-btn   { background: #e2e8f0; color: #2d3748; }
         /* ── BOTTOM SCENARIO BAR ── */
         .scenario-bar {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    display: flex;
-    height: auto;  /* let content + padding define the height */
-    padding-bottom: constant(safe-area-inset-bottom);
-    padding-bottom: env(safe-area-inset-bottom);
-    box-shadow: 0 -2px 8px rgba(0,0,0,.12);
-    z-index: 100;
-}
+            display: flex;
+            flex-shrink: 0;
+            padding-bottom: constant(safe-area-inset-bottom);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
         .scenario-btn {
-    flex: 1;
-    height: 28px;  /* button strip is exactly 28px — same as action bar */
-    border: none;
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.01em;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    /* padding-bottom removed — the bar handles safe area now */
-}
+            flex: 1;
+            height: 28px;
+            border: none;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
         .scenario-btn[data-scenario="working"]    { background: #c8d8e8; color: #2c5f8a; }
         .scenario-btn[data-scenario="bridge"]     { background: #c8e8d0; color: #2c6b45; }
         .scenario-btn[data-scenario="bridge2"]    { background: #c8e8e4; color: #2a6b68; }
@@ -304,7 +301,6 @@
         .result-value.real      { color: #8e8e93; font-size: 12px; font-style: italic; font-weight: 500; }
         .result-value.cost      { color: #c0392b; }
         .result-value.income    { color: #2b6cb0; }
-        /* income breakdown sub-label */
         .income-sub {
             display: block;
             font-size: 10px;
@@ -385,8 +381,7 @@
         /* ── PRINT ── */
         #print-root { display: none; }
         @media print {
-            .app-title, .wrapper, .scenario-bar, .action-bar,
-            .chart-modal { display: none !important; }
+            .app-title, .wrapper, .chart-modal { display: none !important; }
             #print-root { display: block !important; }
             body { padding: 0; background: #fff; height: auto; overflow: visible; }
             html { height: auto; overflow: visible; }
@@ -493,7 +488,7 @@
                         </select>
                     </td>
                 </tr>
-                <!-- ── INCOME SECTION — collapsible, applicable scenarios only ── -->
+                <!-- ── INCOME SECTION — collapsible ── -->
                 <tr id="income-section-header" class="hidden income-toggle-row" onclick="toggleIncomeSection()">
                     <td colspan="2" class="income-section-label">
                         Gov't &amp; Pension Income (monthly)
@@ -554,7 +549,6 @@
                 <span class="result-label" id="res-additions-label">Total Additions / Subtractions</span>
                 <span id="res-additions" class="result-value">$0.00</span>
             </div>
-            <!-- Income offset row -->
             <div class="result-row hidden" id="res-income-row">
                 <span class="result-label">
                     Monthly Income Offset
@@ -562,7 +556,6 @@
                 </span>
                 <span id="res-income" class="result-value income">+$0/mo</span>
             </div>
-            <!-- Net monthly draw row — shown when income is active -->
             <div class="result-row hidden" id="res-net-draw-row">
                 <span class="result-label sub">Net Monthly Draw on Savings</span>
                 <span id="res-net-draw" class="result-value cost">$0/mo</span>
@@ -685,18 +678,19 @@
             <button class="action-btn apply" onclick="applyDefaults(true)">↺ Apply to Calc</button>
         </div>
     </div>
-</div>
-<!-- ACTION BAR -->
-<div class="action-bar">
-    <button class="action-bar-btn chart-btn" onclick="openChartModal()">📊&nbsp; Chart</button>
-    <button class="action-bar-btn pdf-btn"   onclick="exportPDF()">📄&nbsp; Export PDF</button>
-</div>
-<!-- BOTTOM SCENARIO TABS -->
-<div class="scenario-bar">
-    <button data-scenario="working"    class="scenario-btn active" onclick="switchScenario('working')">Working</button>
-    <button data-scenario="bridge"     class="scenario-btn"        onclick="switchScenario('bridge')">Bridge 1</button>
-    <button data-scenario="bridge2"    class="scenario-btn"        onclick="switchScenario('bridge2')">Bridge 2</button>
-    <button data-scenario="retirement" class="scenario-btn"        onclick="switchScenario('retirement')">Retirement</button>
+    <!-- ── BOTTOM BARS — in normal flow, no fixed positioning ── -->
+    <div class="bottom-bars">
+        <div class="action-bar">
+            <button class="action-bar-btn chart-btn" onclick="openChartModal()">📊&nbsp; Chart</button>
+            <button class="action-bar-btn pdf-btn"   onclick="exportPDF()">📄&nbsp; Export PDF</button>
+        </div>
+        <div class="scenario-bar">
+            <button data-scenario="working"    class="scenario-btn active" onclick="switchScenario('working')">Working</button>
+            <button data-scenario="bridge"     class="scenario-btn"        onclick="switchScenario('bridge')">Bridge 1</button>
+            <button data-scenario="bridge2"    class="scenario-btn"        onclick="switchScenario('bridge2')">Bridge 2</button>
+            <button data-scenario="retirement" class="scenario-btn"        onclick="switchScenario('retirement')">Retirement</button>
+        </div>
+    </div>
 </div>
 <!-- CHART MODAL -->
 <div id="chart-modal" class="chart-modal hidden">
@@ -761,10 +755,9 @@
         bridge2:    "Bridge 2 (60–65)",
         retirement: "Retirement (65+)"
     };
-    /* Global flags */
-    var inflAdj          = (localStorage.getItem("global_inflAdj") === "true");
-    var incomeSectionOpen = false;   /* collapsed by default */
-    var activeScenario   = "working";
+    var inflAdj           = (localStorage.getItem("global_inflAdj") === "true");
+    var incomeSectionOpen = false;
+    var activeScenario    = "working";
     var FALLBACKS = {
         working:    { principal:"1,070,000", rate:"7.00", inflation:"2.00", compound:"12", duration:"5",  addition:"1,000", addFreq:"12", addTiming:"start", addSign: 1, qpp:"0",     oas:"0",     pension:"0" },
         bridge:     { principal:"",          rate:"6.00", inflation:"2.50", compound:"12", duration:"5",  addition:"8,500", addFreq:"12", addTiming:"start", addSign:-1, qpp:"0",     oas:"0",     pension:"0" },
@@ -800,18 +793,16 @@
     function realValue(nominal, rate, years) {
         return (rate===0||years===0) ? nominal : nominal/Math.pow(1+rate,years);
     }
-    /* CPI-adjust withdrawals only (negative base); income is never scaled */
+    /* CPI scales withdrawals (negative) only — income never scaled */
     function scaledPmt(base, inflPP, periodIndex) {
         if (!inflAdj || inflPP===0 || base>=0) return base;
         return base * Math.pow(1+inflPP, periodIndex);
     }
-    /* Monthly income → per compounding period; zero for contribution scenarios */
     function incomeOffsetPerPeriod(d, n) {
         if ((d.addSign||1) >= 0) return 0;
         var monthly = rawNum(d.qpp) + rawNum(d.oas) + rawNum(d.pension);
         return monthly * 12 / n;
     }
-    /* Scenario-agnostic ledger builder */
     function computeLedger(d, overridePrincipal) {
         var P        = (overridePrincipal !== null && overridePrincipal !== undefined)
                        ? overridePrincipal : rawNum(d.principal);
@@ -847,7 +838,6 @@
         }
         return rows;
     }
-    /* Build all 4 eras with carry-forward */
     function buildAllLedgers() {
         saveScenarioData();
         var wRows  = computeLedger(scenarioData.working, null);
@@ -872,11 +862,8 @@
         var isB2  = activeScenario === "bridge2";
         var isRet = activeScenario === "retirement";
         var any   = isB2 || isRet;
-        /* header tap target — always visible for applicable scenarios */
         document.getElementById("income-section-header").classList.toggle("hidden", !any);
-        /* chevron state */
         document.getElementById("income-chevron").classList.toggle("open", incomeSectionOpen);
-        /* input rows — only expand when section is open */
         document.getElementById("income-qpp-row").classList.toggle("hidden",     !any  || !incomeSectionOpen);
         document.getElementById("income-oas-row").classList.toggle("hidden",     !isRet || !incomeSectionOpen);
         document.getElementById("income-pension-row").classList.toggle("hidden", !isRet || !incomeSectionOpen);
@@ -886,7 +873,7 @@
         updateIncomeRowVisibility();
     }
     /* ─────────────────────────────────────────────
-       CPI-ADJ TOGGLE (global)
+       CPI-ADJ TOGGLE
     ───────────────────────────────────────────── */
     function syncInflAdjUI() {
         var btn = document.getElementById("infl-adj-toggle");
@@ -973,7 +960,6 @@
         document.getElementById("income-qpp").value     = d.qpp     || "0";
         document.getElementById("income-oas").value     = d.oas     || "0";
         document.getElementById("income-pension").value = d.pension  || "0";
-        /* reset income section to collapsed when switching scenarios */
         incomeSectionOpen = false;
         updateIncomeRowVisibility();
     }
@@ -1083,13 +1069,11 @@
         var pYr      = parseInt(document.getElementById("purchase-year").value)||1;
         var pPeriod  = (pYr-1)*n+Math.floor((pMon-1)*n/12);
         var pApplied = false, pAppliedAmt=0;
-        /* income — only for withdrawal scenarios */
         var qpp     = addSign===-1 ? rawNum(document.getElementById("income-qpp").value)     : 0;
         var oas     = addSign===-1 ? rawNum(document.getElementById("income-oas").value)     : 0;
         var pension = addSign===-1 ? rawNum(document.getElementById("income-pension").value) : 0;
         var totalMonthlyIncome = qpp + oas + pension;
         var incPP   = totalMonthlyIncome * 12 / n;
-        /* net monthly draw for display */
         var grossMonthly = addSign===-1 ? rawNum(document.getElementById("addition").value) : 0;
         var netMonthly   = Math.max(0, grossMonthly - totalMonthlyIncome);
         var inflPP  = inflAdj?(Math.pow(1+inflation,1/n)-1):0;
@@ -1126,7 +1110,6 @@
         var inflPct     = (parseFloat(document.getElementById("inflation").value)||0).toFixed(2);
         var adjSuffix   = inflAdj?" • CPI ADJ":"";
         var incomeSuffix= totalMonthlyIncome>0?" • $"+Math.round(totalMonthlyIncome).toLocaleString()+"/mo income":"";
-        /* additions label: relabel for withdrawal scenarios */
         document.getElementById("res-additions-label").textContent =
             addSign===-1 ? "Total Net Draw on Savings" : "Total Additions / Subtractions";
         document.getElementById("res-additions").textContent  = fmt(totAdd);
@@ -1138,7 +1121,6 @@
         document.getElementById("ledger-body").innerHTML      = html;
         document.getElementById("ledger-foot").innerHTML      =
             '<tr><td>Total</td><td class="center-col">'+fmt(totAdd+totInt)+'</td><td class="right-col">'+fmt(bal)+'</td></tr>';
-        /* income row */
         var incRow=document.getElementById("res-income-row");
         var netRow=document.getElementById("res-net-draw-row");
         if (totalMonthlyIncome>0 && addSign===-1) {
@@ -1155,7 +1137,6 @@
             incRow.classList.add("hidden");
             netRow.classList.add("hidden");
         }
-        /* purchase row */
         var prRow=document.getElementById("res-purchase-row");
         if (pActive&&pAppliedAmt>0){
             prRow.classList.remove("hidden");
@@ -1335,7 +1316,6 @@
             input.addEventListener("keydown",function(){if(!cleared){cleared=true;input.value="";input.style.color="#1c1c1e";}});
             input.addEventListener("blur",function(){input.style.color="#1c1c1e";if(input.value.trim()==="")input.value=savedValue;});
         });
-        /* event listeners */
         document.getElementById("principal").addEventListener("input",  calculate);
         document.getElementById("principal").addEventListener("blur",   function(){formatField("principal");});
         document.getElementById("addition").addEventListener("input",   calculate);
