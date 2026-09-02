@@ -82,6 +82,7 @@
         .card { background: #fff; border-radius: 10px; overflow: hidden; width: 100%; box-shadow: 0 1px 5px rgba(0,0,0,.1); flex-shrink: 0; }
         .card-header { background: #4a5568; color: #fff; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 5px 10px; }
         .card-header.defaults-header { background: #2d3748; }
+        .card.faded { opacity: 0.42; pointer-events: none; }
         /* ── UNIFIED COLLAPSIBLE HEADER ── */
         .collapsible-header {
             display: flex; justify-content: space-between; align-items: center;
@@ -768,11 +769,18 @@ function hideCostsBody() {
 function updateIncomeCardVisibility() {
     var isB2  = activeScenario === "bridge2";
     var isRet = activeScenario === "retirement";
-    var any   = isB2 || isRet;
-    /* Show/hide the whole card */
-    document.getElementById("income-card").classList.toggle("hidden", !any);
+    var active = isB2 || isRet;
+    var card = document.getElementById("income-card");
+    var hdr  = card.querySelector(".collapsible-header span:first-child");
+    /* Always visible — faded + locked when not applicable */
+    card.classList.remove("hidden");
+    card.classList.toggle("faded", !active);
+    /* Update title */
+    hdr.textContent = active
+        ? "Gov\u2019t & Pension Income (monthly)"
+        : "Gov\u2019t & Pension Income \u2014 N/A";
     /* OAS and pension only in retirement */
-    document.getElementById("income-oas-row").classList.toggle("hidden",    !isRet);
+    document.getElementById("income-oas-row").classList.toggle("hidden",     !isRet);
     document.getElementById("income-pension-row").classList.toggle("hidden", !isRet);
     /* Collapse body when switching scenarios */
     document.getElementById("income-body").classList.add("hidden");
