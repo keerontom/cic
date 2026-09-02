@@ -194,6 +194,61 @@
         .action-bar-btn:active { opacity: 0.7; }
         .action-bar-btn.chart-btn { background: #dbeafe; color: #1e40af; }
         .action-bar-btn.pdf-btn   { background: #e2e8f0; color: #2d3748; }
+        <button class="action-bar-btn help-btn" onclick="openHelpModal()">❓&nbsp; Help</button>
+        .action-bar-btn.help-btn { background: #e9d8fd; color: #553c9a; }
+.help-modal {
+    position: fixed; inset: 0; background: #f7f7f7; z-index: 300;
+    display: flex; flex-direction: column;
+    padding-top: calc(6px + constant(safe-area-inset-top));
+    padding-top: calc(6px + env(safe-area-inset-top));
+    padding-bottom: calc(8px + constant(safe-area-inset-bottom));
+    padding-bottom: calc(8px + env(safe-area-inset-bottom));
+}
+.help-modal-header {
+    display: flex; align-items: center;
+    background: #553c9a; padding: 6px 10px; gap: 8px; flex-shrink: 0;
+}
+.help-modal-title {
+    color: #fff; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase; flex: 1;
+}
+.help-close-btn {
+    background: none; border: none; color: #fff;
+    font-size: 20px; cursor: pointer; line-height: 1;
+    -webkit-tap-highlight-color: transparent;
+}
+.help-scroll {
+    flex: 1; overflow-y: auto; overscroll-behavior-y: contain;
+    padding: 10px;
+}
+.help-scroll::-webkit-scrollbar { display: none; }
+.help-scroll { scrollbar-width: none; }
+.help-section {
+    background: #fff; border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    margin-bottom: 10px; overflow: hidden;
+}
+.help-section-title {
+    background: #553c9a; color: #fff;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 5px 10px;
+}
+.help-item {
+    padding: 8px 10px;
+    border-bottom: 1px solid #f0f0f5;
+}
+.help-item:last-child { border-bottom: none; }
+.help-field {
+    font-size: 12px; font-weight: 700; color: #2d3748; margin-bottom: 2px;
+}
+.help-desc {
+    font-size: 12px; color: #4a5568; line-height: 1.5;
+}
+.help-tip {
+    font-size: 11px; color: #805ad5; font-style: italic; margin-top: 3px;
+}
+
         /* ── CARDS ── */
         .card {
             background: #fff;
@@ -1420,6 +1475,12 @@ function formatField(id) {
     el.value=num.toLocaleString("en-CA",{maximumFractionDigits:2});
     calculate();
 }
+    function openHelpModal() {
+    document.getElementById("help-modal").classList.remove("hidden");
+}
+function closeHelpModal() {
+    document.getElementById("help-modal").classList.add("hidden");
+}
 /* ─────────────────────────────────────────────
    INIT
 ───────────────────────────────────────────── */
@@ -1478,5 +1539,173 @@ document.addEventListener("DOMContentLoaded",function(){
     document.getElementById("def-inflation").addEventListener("blur",function(){var v=parseFloat(this.value);this.value=isNaN(v)?"0.00":v.toFixed(2);});
 });
 </script>
+    <!-- HELP MODAL -->
+<div id="help-modal" class="help-modal hidden">
+    <div class="help-modal-header">
+        <span class="help-modal-title">❓ Help &amp; Field Guide</span>
+        <button class="help-close-btn" onclick="closeHelpModal()">✕</button>
+    </div>
+    <div class="help-scroll">
+        <div class="help-section">
+            <div class="help-section-title">🧮 Calculator — Main Fields</div>
+            <div class="help-item">
+                <div class="help-field">Principal</div>
+                <div class="help-desc">The total amount of money you're starting with — your combined savings pot at the beginning of each life phase. For the first phase (Now–55), this is all of Keeron and Erin's savings added together.</div>
+                <div class="help-tip">💡 When you move from one phase to the next, this number is automatically carried forward from the previous ending balance.</div>
+            </div>
+            <div class="help-item">
+                <div class="help-field">Interest %</div>
+                <div class="help-desc">The average annual return you expect your investments to earn. For example, 7% means your money grows by roughly 7% per year before withdrawals.</div>
+                <div class="help-tip">💡 Higher in early phases (more growth assets), lower in retirement (more conservative mix).</div>
+            </div>
+            <div class="help-item">
+                <div class="help-field">Inflation % &amp; ADJ toggle</div>
+                <div class="help-desc">Inflation is how much prices rise each year — set to 3% here as a default. When the ADJ toggle is ON, your monthly withdrawals automatically increase each year to keep up with inflation (so your lifestyle is protected). When OFF, withdrawals stay the same dollar amount throughout.</div>
+                <div class="help-tip">💡 Turning ADJ ON is more realistic — $9,000 today won't feel like $9,000 in 10 years.</div>
+            </div>
+            <div class="help-item">
+                <div class="help-field">Compounding</div>
+                <div class="help-desc">How often your interest is calculated and added to your balance. Monthly is the most common and most accurate for most investment accounts.</div>
+            </div>
+            <div class="help-item">
+                <div class="help-field">Duration (Years)</div>
+                <div class="help-desc">How many years this phase lasts. The phases are pre-set: Now–55 is 4 years, 55–60 and 60–65 are 5 years each, and retirement (65+) is 35 years.</div>
+            </div>
+            <div class="help-item">
+                <div class="help-field">Gross Monthly (+ or −)</div>
+                <div class="help-desc">The amount of money going into or out of the portfolio each month. Press the + / − button to switch between contributing (saving) and withdrawing (spending from savings). During retirement phases this is your household spending target before taxes.</div>
+                <div class="help-tip">💡 "Gross" means before tax. The Tax Profile card helps estimate how much more you'd actually need to withdraw to end up with your target amount after tax.</div>
+            </div>
+            <div class="help-item">
+                <div class="help-field">Add at (Start / End of period)</div>
+                <div class="help-desc">Whether the withdrawal or contribution happens at the beginning or end of each compounding period. "Start of period" is slightly more conservative for withdrawals (money leaves before earning interest that period).</div>
+            </div>
+            <div class="help-item">
+                <div class="help-field">One-Time Cost</div>
+                <div class="help-desc">An optional one-time large expense — like a renovation, a car, or a trip — that comes out of the portfolio at a specific point in time. Toggle it ON, enter the amount, and set the month and year it happens.</div>
+            </div>
+        </div>
+        <div class="help-section">
+            <div class="help-section-title">🏦 Gov't &amp; Pension Income</div>
+            <div class="help-item">
+                <div class="help-field">QPP (combined)</div>
+                <div class="help-desc">Quebec Pension Plan — the government retirement pension both Keeron and Erin have contributed to through their working years. This section shows the combined amount for both. It kicks in at age 60 in the 60–65 phase. Currently set to $700/mo each = $1,400/mo combined.</div>
+                <div class="help-tip">💡 Because QPP reduces how much you need to take from your savings, it effectively extends how long your money lasts.</div>
+            </div>
+            <div class="help-item">
+                <div class="help-field">OAS (combined)</div>
+                <div class="help-desc">Old Age Security — a separate government benefit that starts at age 65. Combined for both Keeron and Erin, currently set to $1,400/mo total.</div>
+            </div>
+            <div class="help-item">
+                <div class="help-field">Pension (Erin)</div>
+                <div class="help-desc">Erin's defined benefit pension from her employer, which pays out $2,000/month starting at age 65. This is guaranteed income that doesn't come from your savings at all.</div>
+                <div class="help-tip">💡 Together, QPP + OAS + Erin's pension cover $4,800/mo in retirement — meaning only $3,200/mo needs to come from your savings pool.</div>
+            </div>
+        </div>
+        <div class="help-section">
+            <div class="help-section-title">💛 Tax Profile — Keeron &amp; Erin</div>
+            <div class="help-item">
+                <div class="help-field">Tax Modelling (ON / OFF)</div>
+                <div class="help-desc">Turns the tax estimate on or off. When ON, the calculator estimates how much federal and Quebec income tax you'd owe based on where your money is coming from. Only available during withdrawal phases.</div>
+            </div>
+            <div class="help-item">
+                <div class="help-field">TFSA %</div>
+                <div class="help-desc">What percentage of your total combined savings is in Tax-Free Savings Accounts. Money withdrawn from a TFSA is completely tax-free — it doesn't count as income at all. Currently ~20% of your total portfolio.</div>
+                <div class="help-tip">💡 Erin and Keeron each have contributed the maximum since TFSAs began — about $109,000 each.</div>
+            </div>
+            <div class="help-item">
+                <div class="help-field">RRSP %</div>
+                <div class="help-desc">What percentage of your total savings is in Registered Retirement Savings Plans. Every dollar withdrawn from an RRSP counts as fully taxable income — like a salary. Keeron has $171,000 and Erin has $340,000 in RRSPs, making up about 45% of the total.</div>
+                <div class="help-tip">💡 Best strategy: draw down RRSP early (55–60) while your income is lowest, before QPP and OAS push you into higher tax brackets.</div>
+            </div>
+            <div class="help-item">
+                <div class="help-field">Non-Reg % (auto)</div>
+                <div class="help-desc">The remaining percentage — money in regular (non-registered) investment accounts. Only the profit (gain) portion is taxable, and even then only half of it counts as income under Canada's capital gains rules. This is Keeron's $393,000 account.</div>
+            </div>
+            <div class="help-item">
+                <div class="help-field">NR Gain %</div>
+                <div class="help-desc">Of Keeron's non-registered investments, what percentage is profit (unrealized gain) vs. the original amount paid. Keeron originally invested $50,000 and it's now worth $393,000 — so about 87% is gain. Only half of that gain (43.5% of the withdrawal) gets added to taxable income.</div>
+            </div>
+            <div class="help-item">
+                <div class="help-field">Keeron Draw %</div>
+                <div class="help-desc">What share of each monthly withdrawal is attributed to Keeron vs Erin for tax purposes. Set to 50% by default, meaning each person is considered to withdraw half. This matters because Canada taxes each person individually — splitting income between two people almost always results in a lower combined tax bill than one person taking everything.</div>
+            </div>
+            <div class="help-item">
+                <div class="help-field">Draw Order</div>
+                <div class="help-desc">The recommended order in which to draw from accounts. "RRSP First ★" means drawing from RRSPs before TFSAs — this is the smartest approach for most people in early retirement when income is lowest. "TFSA First" saves RRSPs for last. "Proportional" draws from all accounts evenly.</div>
+                <div class="help-tip">💡 RRSP First is recommended because it reduces the RRSP balance before mandatory withdrawals kick in at age 71, preventing a large future income spike.</div>
+            </div>
+        </div>
+        <div class="help-section">
+            <div class="help-section-title">📊 Results Card</div>
+            <div class="help-item">
+                <div class="help-field">Total Net Draw on Savings</div>
+                <div class="help-desc">The total amount taken out of (or added to) the portfolio over the entire phase, after accounting for income offsets like QPP, OAS, and pension.</div>
+            </div>
+            <div class="help-item">
+                <div class="help-field">Monthly Income Offset</div>
+                <div class="help-desc">The total government and pension income received each month. This reduces how much you need to take from your savings.</div>
+            </div>
+            <div class="help-item">
+                <div class="help-field">Net Monthly Draw on Savings</div>
+                <div class="help-desc">After subtracting income offsets, this is the actual amount coming out of your investment portfolio each month.</div>
+            </div>
+            <div class="help-item">
+                <div class="help-field">Ending Balance</div>
+                <div class="help-desc">How much money is left in your combined portfolio at the end of this phase. This automatically becomes the starting balance for the next phase.</div>
+            </div>
+            <div class="help-item">
+                <div class="help-field">Real Value (today's $)</div>
+                <div class="help-desc">The ending balance expressed in today's purchasing power. Because of inflation, $1,000,000 in 20 years won't buy what $1,000,000 buys today. This number tells you what your future balance is really worth in current dollars.</div>
+            </div>
+            <div class="help-item">
+                <div class="help-field">Est. Household Tax / yr</div>
+                <div class="help-desc">An estimate of how much combined federal and Quebec income tax Keeron and Erin would owe in a given year, based on the withdrawal amounts and account types. Uses 2024 tax brackets.</div>
+            </div>
+            <div class="help-item">
+                <div class="help-field">Eff. Rate · Monthly Reserve</div>
+                <div class="help-desc">The effective (blended) tax rate on your withdrawals, and how much you'd need to set aside each month to cover the tax bill.</div>
+            </div>
+            <div class="help-item">
+                <div class="help-field">Gross Draw Needed to Net Target</div>
+                <div class="help-desc">If you want to actually spend your target amount (e.g. $9,000/mo), you need to withdraw more than that to cover taxes. This is the grossed-up amount you'd need to take out of your portfolio to end up with your spending target after tax.</div>
+                <div class="help-tip">💡 Example: if your effective tax rate is 18%, and you want $9,000 to spend, you'd need to withdraw about $10,976 to net $9,000 after tax.</div>
+            </div>
+        </div>
+        <div class="help-section">
+            <div class="help-section-title">🗂️ Life Phase Tabs</div>
+            <div class="help-item">
+                <div class="help-field">Now – 55</div>
+                <div class="help-desc">The current phase — Keeron and Erin are still working and contributing to savings. Duration: ~4 years (until Keeron turns 55 in January 2031). No government income yet.</div>
+            </div>
+            <div class="help-item">
+                <div class="help-field">55 – 60</div>
+                <div class="help-desc">Early retirement — both stop working. The full $10,000/month household draw comes from savings. No government income yet. This is the highest-pressure phase for the portfolio.</div>
+            </div>
+            <div class="help-item">
+                <div class="help-field">60 – 65</div>
+                <div class="help-desc">QPP kicks in for both Keeron and Erin ($700/mo each = $1,400/mo combined), reducing the net draw from savings. Household target is $9,000/mo.</div>
+            </div>
+            <div class="help-item">
+                <div class="help-field">65+</div>
+                <div class="help-desc">Full retirement — QPP + OAS + Erin's pension provide $4,800/mo in guaranteed income. Only $3,200/mo needs to come from savings to meet the $8,000/mo household target. Duration: 35 years.</div>
+            </div>
+        </div>
+        <div class="help-section">
+            <div class="help-section-title">📋 Ledger Tab</div>
+            <div class="help-item">
+                <div class="help-field">Year-by-year breakdown</div>
+                <div class="help-desc">Shows every year of the current phase: how much was added or withdrawn, how much interest was earned, and what the balance was at the start and end of each year. Real values (in today's dollars) appear below each year's ending balance when inflation is set.</div>
+            </div>
+        </div>
+        <div class="help-section">
+            <div class="help-section-title">⚙️ Defaults Tab</div>
+            <div class="help-item">
+                <div class="help-field">Save Defaults / Apply to Calc</div>
+                <div class="help-desc">Each life phase has its own saved defaults. Use "Save Defaults" to lock in your preferred settings for the current phase, and "Apply to Calc" to restore them if you've been experimenting with different numbers.</div>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
