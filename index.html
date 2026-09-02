@@ -97,16 +97,31 @@
         .controls { display: flex; align-items: center; justify-content: flex-end; gap: 4px; width: 100%; }
         /* ── INCOME / COSTS SECTIONS ── */
         .income-toggle-row td { cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; }
-        .income-section-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #2b6cb0; background: #ebf8ff; padding: 5px 10px; border-bottom: 1px solid #bee3f8 !important; }
-        .costs-section-label {
-    color: #744210;
-    background: #fffbeb;
-    border-bottom: 1px solid #fbd38d !important;
+        .income-section-label {
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #2b6cb0;
+    background: #ebf8ff;
     padding: 5px 10px;
+    line-height: 1.4;
+    border-bottom: 1px solid #bee3f8 !important;
 }
+.costs-section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #744210;
+    background: #fffbeb;
+    padding: 5px 10px;
+    line-height: 1.4;
+    border-top: 6px solid #f2f2f7;
+    border-bottom: 1px solid #fbd38d !important;
+}
+        #income-section-header,
+        #costs-section-header { border-bottom: none !important; }
         .income-chevron { font-size: 10px; display: inline-block; transition: transform 0.2s; line-height: 1.4; }
         .income-chevron.open { transform: rotate(180deg); }
         .income-chevron.float-right { float: right; }
