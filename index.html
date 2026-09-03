@@ -1190,54 +1190,58 @@ function updateScenarioTabs() {
     });
     document.querySelector('[data-scenario="'+activeScenario+'"]').classList.add("active");
 }
+function carryForward(fromScenario, toScenario) {
+    var bal = calcEndingBalance(scenarioData[fromScenario]);
+    scenarioData[toScenario].principal =
+        bal.toLocaleString("en-CA", {maximumFractionDigits:2});
+    var prevTx = computeTaxEstimate(scenarioData[fromScenario]);
+    if (prevTx) {
+        /* Withdrawal phase — use depleted per-person balances */
+        scenarioData[toScenario].port_k_tfsa =
+            Math.round(prevTx.end_k_tfsa).toLocaleString("en-CA");
+        scenarioData[toScenario].port_k_rrsp =
+            Math.round(prevTx.end_k_rrsp).toLocaleString("en-CA");
+        scenarioData[toScenario].port_k_nrg  =
+            Math.round(prevTx.end_k_nrg).toLocaleString("en-CA");
+        scenarioData[toScenario].port_e_tfsa =
+            Math.round(prevTx.end_e_tfsa).toLocaleString("en-CA");
+        scenarioData[toScenario].port_e_rrsp =
+            Math.round(prevTx.end_e_rrsp).toLocaleString("en-CA");
+    } else {
+        /* Contribution phase — grow accounts at annual rate, scale to ending balance */
+        var pd  = scenarioData[fromScenario];
+        var r_p = (parseFloat(pd.rate)||0) / 100;
+        var t_p = parseInt(pd.duration) || 0;
+        var g   = Math.pow(1 + r_p, t_p);
+        var k_t = rawNum(pd.port_k_tfsa) * g;
+        var k_r = rawNum(pd.port_k_rrsp) * g;
+        var k_n = rawNum(pd.port_k_nrg)  * g;
+        var e_t = rawNum(pd.port_e_tfsa) * g;
+        var e_r = rawNum(pd.port_e_rrsp) * g;
+        var sum = k_t + k_r + k_n + e_t + e_r;
+        var sf  = sum > 0 ? bal / sum : 1;
+        scenarioData[toScenario].port_k_tfsa =
+            Math.round(k_t * sf).toLocaleString("en-CA");
+        scenarioData[toScenario].port_k_rrsp =
+            Math.round(k_r * sf).toLocaleString("en-CA");
+        scenarioData[toScenario].port_k_nrg  =
+            Math.round(k_n * sf).toLocaleString("en-CA");
+        scenarioData[toScenario].port_e_tfsa =
+            Math.round(e_t * sf).toLocaleString("en-CA");
+        scenarioData[toScenario].port_e_rrsp =
+            Math.round(e_r * sf).toLocaleString("en-CA");
+    }
+}
 function switchScenario(newScenario) {
     if (newScenario === activeScenario) return;
     saveScenarioData();
     var prev = activeScenario;
     activeScenario = newScenario;
     if (SCENARIO_ORDER[newScenario] > SCENARIO_ORDER[prev]) {
-        /* Carry forward total ending balance */
-        var bal = calcEndingBalance(scenarioData[prev]);
-        scenarioData[newScenario].principal =
-            bal.toLocaleString("en-CA", {maximumFractionDigits:2});
-        var prevTx = computeTaxEstimate(scenarioData[prev]);
-        if (prevTx) {
-            /* Withdrawal phase — use depleted per-person balances */
-            scenarioData[newScenario].port_k_tfsa =
-                Math.round(prevTx.end_k_tfsa).toLocaleString("en-CA");
-            scenarioData[newScenario].port_k_rrsp =
-                Math.round(prevTx.end_k_rrsp).toLocaleString("en-CA");
-            scenarioData[newScenario].port_k_nrg  =
-                Math.round(prevTx.end_k_nrg).toLocaleString("en-CA");
-            scenarioData[newScenario].port_e_tfsa =
-                Math.round(prevTx.end_e_tfsa).toLocaleString("en-CA");
-            scenarioData[newScenario].port_e_rrsp =
-                Math.round(prevTx.end_e_rrsp).toLocaleString("en-CA");
-        } else {
-            /* Contribution phase (Now-55) — grow each account at the annual
-               rate, then scale proportionally to match the actual ending
-               balance which includes contributions */
-            var pd  = scenarioData[prev];
-            var r_p = (parseFloat(pd.rate)||0) / 100;
-            var t_p = parseInt(pd.duration) || 0;
-            var g   = Math.pow(1 + r_p, t_p);
-            var k_t = rawNum(pd.port_k_tfsa) * g;
-            var k_r = rawNum(pd.port_k_rrsp) * g;
-            var k_n = rawNum(pd.port_k_nrg)  * g;
-            var e_t = rawNum(pd.port_e_tfsa) * g;
-            var e_r = rawNum(pd.port_e_rrsp) * g;
-            var sum = k_t + k_r + k_n + e_t + e_r;
-            var sf  = sum > 0 ? bal / sum : 1;
-            scenarioData[newScenario].port_k_tfsa =
-                Math.round(k_t * sf).toLocaleString("en-CA");
-            scenarioData[newScenario].port_k_rrsp =
-                Math.round(k_r * sf).toLocaleString("en-CA");
-            scenarioData[newScenario].port_k_nrg  =
-                Math.round(k_n * sf).toLocaleString("en-CA");
-            scenarioData[newScenario].port_e_tfsa =
-                Math.round(e_t * sf).toLocaleString("en-CA");
-            scenarioData[newScenario].port_e_rrsp =
-                Math.round(e_r * sf).toLocaleString("en-CA");
+        /* Cascade through EVERY intermediate phase in order —
+           prevents skipping when jumping e.g. Now-55 → 65+ directly */
+        for (var i = SCENARIO_ORDER[prev]; i < SCENARIO_ORDER[newScenario]; i++) {
+            carryForward(SCENARIOS[i], SCENARIOS[i + 1]);
         }
     }
     loadScenarioData(newScenario);
@@ -1245,6 +1249,7 @@ function switchScenario(newScenario) {
     updateTopTabTint();
     calculate();
 }
+
 /* ─────────────────────────────────────────────
    TOP TAB SWITCHING (Defaults tab removed)
 ───────────────────────────────────────────── */
