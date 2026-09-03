@@ -385,29 +385,26 @@
                     <span id="res-real" class="result-value real">$0.00</span>
                 </div>
                 <div class="result-row tax-divider-row hidden" id="res-tax-divider">
-                    <span class="tax-divider-label">Tax Estimate</span>
-                    <span class="tax-divider-note">Fed + Quebec · 2024 brackets</span>
-                </div>
-                <div class="result-row hidden" id="res-tax-keeron-row">
-                    <span class="result-label sub">Keeron Taxable / yr</span>
-                    <span id="res-tax-keeron" class="result-value" style="font-size:12px;color:#744210">$0</span>
-                </div>
-                <div class="result-row hidden" id="res-tax-erin-row">
-                    <span class="result-label sub">Erin Taxable / yr</span>
-                    <span id="res-tax-erin" class="result-value" style="font-size:12px;color:#744210">$0</span>
-                </div>
-                <div class="result-row hidden" id="res-tax-total-row">
-                    <span class="result-label">Est. Household Tax / yr</span>
-                    <span id="res-tax-total" class="result-value tax-val">$0</span>
-                </div>
-                <div class="result-row hidden" id="res-tax-rate-row">
-                    <span class="result-label sub">Eff. Rate &nbsp;·&nbsp; Monthly Reserve</span>
-                    <span id="res-tax-rate" class="result-value tax-val" style="font-size:12px">0% · $0</span>
-                </div>
-                <div class="result-row hidden" id="res-tax-gross-row">
-                    <span class="result-label sub">Gross Draw Needed to Net Target</span>
-                    <span id="res-tax-gross" class="result-value cost" style="font-size:13px">$0/mo</span>
-                </div>
+    <span class="tax-divider-label">Tax Estimate</span>
+    <span class="tax-divider-note">Fed + Quebec · 2024 brackets</span>
+</div>
+<div class="result-row hidden" id="res-tax-withdrawal-row">
+    <span class="result-label sub">Monthly Withdrawal</span>
+    <span id="res-tax-withdrawal" class="result-value" style="font-size:13px">$0/mo</span>
+</div>
+<div class="result-row hidden" id="res-tax-owing-row">
+    <span class="result-label sub">Est. Tax Owing / mo</span>
+    <span id="res-tax-owing" class="result-value cost" style="font-size:13px">−$0/mo</span>
+</div>
+<div class="result-row hidden" id="res-tax-aftertax-row">
+    <span class="result-label">After-Tax Monthly</span>
+    <span id="res-tax-aftertax" class="result-value highlight">$0/mo</span>
+</div>
+<div class="result-row hidden" id="res-tax-rate-row">
+    <span class="result-label sub">Effective Tax Rate</span>
+    <span id="res-tax-rate" class="result-value tax-val" style="font-size:12px">0%</span>
+</div>
+
             </div>
         </div>
     </div>
@@ -1237,18 +1234,19 @@ function calculate() {
     }
     saveScenarioData();
     var tx = computeTaxEstimate(scenarioData[activeScenario]);
-    var taxRows = ["res-tax-divider","res-tax-keeron-row","res-tax-erin-row","res-tax-total-row","res-tax-rate-row","res-tax-gross-row"];
-    if (tx) {
-        taxRows.forEach(function(id){ document.getElementById(id).classList.remove("hidden"); });
-        document.getElementById("res-tax-keeron").textContent = fmt(tx.k_taxable);
-        document.getElementById("res-tax-erin").textContent   = fmt(tx.e_taxable);
-        document.getElementById("res-tax-total").textContent  = fmt(tx.total_tax);
-        document.getElementById("res-tax-rate").textContent   = pct(tx.eff_rate*100)+' · '+fmt(tx.monthly_tax)+'/mo';
-        document.getElementById("res-tax-gross").textContent  = fmt(tx.gross_needed)+'/mo';
-        document.getElementById("tax-card-header").classList.add("active");
-    } else {
-        taxRows.forEach(function(id){ document.getElementById(id).classList.add("hidden"); });
-        document.getElementById("tax-card-header").classList.toggle("active",!!scenarioData[activeScenario].taxEnabled);
+    var taxRows = ["res-tax-divider","res-tax-withdrawal-row","res-tax-owing-row","res-tax-aftertax-row","res-tax-rate-row"];
+if (tx) {
+    taxRows.forEach(function(id){ document.getElementById(id).classList.remove("hidden"); });
+    var grossMo   = rawNum(document.getElementById("addition").value);
+    var afterTaxMo = grossMo - tx.monthly_tax;
+    document.getElementById("res-tax-withdrawal").textContent = fmt(grossMo)+'/mo';
+    document.getElementById("res-tax-owing").textContent      = '−'+fmt(tx.monthly_tax)+'/mo';
+    document.getElementById("res-tax-aftertax").textContent   = fmt(afterTaxMo)+'/mo';
+    document.getElementById("res-tax-rate").textContent       = pct(tx.eff_rate*100);
+    document.getElementById("tax-card-header").classList.add("active");
+} else {
+    taxRows.forEach(function(id){ document.getElementById(id).classList.add("hidden"); });
+    document.getElementById("tax-card-header").classList.toggle("active",!!scenarioData[activeScenario].taxEnabled);
     }
 }
 /* ─────────────────────────────────────────────
