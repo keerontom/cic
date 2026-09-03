@@ -401,12 +401,15 @@
                 </div>
                 <!-- Ending Balance + Real Value as sub-line -->
                 <div class="result-row">
-                    <span class="result-label">Ending Balance</span>
-                    <span style="text-align:right">
-                        <span id="res-ending" class="result-value highlight" style="display:block">$0.00</span>
-                        <span id="res-real"   class="result-value real"      style="display:block"></span>
-                    </span>
-                </div>
+    <span class="result-label">Ending Balance
+        <span class="income-sub" id="res-real-label"
+              style="color:#a0aec0"></span>
+    </span>
+    <span style="text-align:right">
+        <span id="res-ending" class="result-value highlight" style="display:block">$0.00</span>
+        <span id="res-real"   class="result-value real"      style="display:block"></span>
+    </span>
+</div>
                 <!-- After-Tax Monthly — always visible on withdrawal phases -->
                 <div class="result-row hidden" id="res-aftertax-row">
                     <span class="result-label">After-Tax Monthly</span>
@@ -1356,10 +1359,11 @@ function calculate() {
         addSign===-1 ? "Total Net Draw on Savings" : "Total Additions / Subtractions";
     document.getElementById("res-additions").textContent = fmt(totAdd);
     document.getElementById("res-interest").textContent  = fmt(totInt);
-    document.getElementById("res-ending").textContent    = fmt(bal);
-    /* Real value as subtle sub-line with inline inflation rate */
+    document.getElementById("res-ending").textContent = fmt(bal);
+    document.getElementById("res-real-label").textContent =
+        inflation > 0 ? "Real Value (today\u2019s $) @ "+inflPct+"% inflation" : "";
     document.getElementById("res-real").textContent =
-        inflation > 0 ? fmt(endingReal)+" real @ "+inflPct+"%" : "";
+        inflation > 0 ? fmt(endingReal) : "";
     document.getElementById("ledger-title").textContent =
         t+" YEARS"+adjSuffix+incomeSuffix;
     document.getElementById("ledger-body").innerHTML = html;
