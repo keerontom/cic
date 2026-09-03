@@ -404,7 +404,14 @@
     <span class="result-label sub">Effective Tax Rate</span>
     <span id="res-tax-rate" class="result-value tax-val" style="font-size:12px">0%</span>
 </div>
-
+<div class="result-row hidden" id="res-tax-keeron-row">
+    <span class="result-label sub">Keeron — Taxable / Tax</span>
+    <span id="res-tax-keeron" class="result-value" style="font-size:11px;color:#744210">$0 / $0</span>
+</div>
+<div class="result-row hidden" id="res-tax-erin-row">
+    <span class="result-label sub">Erin — Taxable / Tax</span>
+    <span id="res-tax-erin" class="result-value" style="font-size:11px;color:#744210">$0 / $0</span>
+</div>
             </div>
         </div>
     </div>
@@ -866,24 +873,47 @@ function computeTaxEstimate(d) {
     var gain_f  = Math.min(1, Math.max(0, (parseFloat(d.nrg_gain)||0) / 100));
     var k_split = Math.min(1, Math.max(0, (parseFloat(d.keeron_split)||50) / 100));
     var e_split = 1 - k_split;
-    var rrsp_draw         = grossAnnual * rrsp_f;
-    var nrg_taxable       = grossAnnual * nrg_f * gain_f * 0.5;
-    var portfolio_taxable = rrsp_draw + nrg_taxable;
+    var order   = d.withdrawal_order || "rrsp_first";
+    /* Apply draw order — each bucket is capped at its portfolio allocation */
+    var rrsp_avail = grossAnnual * rrsp_f;
+    var tfsa_avail = grossAnnual * tfsa_f;
+    var draw_rrsp, draw_tfsa, draw_nrg, rem;
+    if (order === "rrsp_first") {
+        draw_rrsp = Math.min(grossAnnual, rrsp_avail);
+        rem       = grossAnnual - draw_rrsp;
+        draw_tfsa = Math.min(rem, tfsa_avail);
+        draw_nrg  = rem - draw_tfsa;
+    } else if (order === "tfsa_first") {
+        draw_tfsa = Math.min(grossAnnual, tfsa_avail);
+        rem       = grossAnnual - draw_tfsa;
+        draw_rrsp = Math.min(rem, rrsp_avail);
+        draw_nrg  = rem - draw_rrsp;
+    } else {
+        /* proportional */
+        draw_rrsp = rrsp_avail;
+        draw_tfsa = grossAnnual * tfsa_f;
+        draw_nrg  = grossAnnual * nrg_f;
+    }
+    var nrg_taxable_total = draw_nrg * gain_f * 0.5;
+    var portfolio_taxable = draw_rrsp + nrg_taxable_total;
     var qpp_annual = rawNum(d.qpp) * 12;
     var oas_annual = rawNum(d.oas) * 12;
     var pen_annual = rawNum(d.pension) * 12;
-    var k_fixed = (qpp_annual + oas_annual) * 0.5;
-    var e_fixed = (qpp_annual + oas_annual) * 0.5 + pen_annual;
+    var k_fixed    = (qpp_annual + oas_annual) * 0.5;
+    var e_fixed    = (qpp_annual + oas_annual) * 0.5 + pen_annual;
     var k_taxable = k_fixed + portfolio_taxable * k_split;
     var e_taxable = e_fixed + portfolio_taxable * e_split;
-    var k_tax = computePersonTax(k_taxable);
-    var e_tax = computePersonTax(e_taxable);
-    var total_tax    = k_tax + e_tax;
-    var eff_rate     = grossAnnual > 0 ? total_tax / grossAnnual : 0;
-    var gross_needed = eff_rate < 1 ? grossMonthly / (1 - eff_rate) : grossMonthly;
-    return { k_taxable:k_taxable, e_taxable:e_taxable, k_tax:k_tax, e_tax:e_tax,
-             total_tax:total_tax, eff_rate:eff_rate, monthly_tax:total_tax/12, gross_needed:gross_needed };
+    var k_tax     = computePersonTax(k_taxable);
+    var e_tax     = computePersonTax(e_taxable);
+    var total_tax = k_tax + e_tax;
+    var eff_rate  = grossAnnual > 0 ? total_tax / grossAnnual : 0;
+    return { k_taxable:k_taxable, e_taxable:e_taxable,
+             k_tax:k_tax, e_tax:e_tax,
+             total_tax:total_tax, eff_rate:eff_rate,
+             monthly_tax:total_tax/12,
+             draw_rrsp:draw_rrsp, draw_tfsa:draw_tfsa, draw_nrg:draw_nrg };
 }
+
 /* ─────────────────────────────────────────────
    CORE MATH
 ───────────────────────────────────────────── */
@@ -1235,20 +1265,24 @@ function calculate() {
     }
     saveScenarioData();
     var tx = computeTaxEstimate(scenarioData[activeScenario]);
-    var taxRows = ["res-tax-divider","res-tax-withdrawal-row","res-tax-owing-row","res-tax-aftertax-row","res-tax-rate-row"];
+  var taxRows = ["res-tax-divider","res-tax-withdrawal-row","res-tax-owing-row",
+               "res-tax-aftertax-row","res-tax-rate-row","res-tax-keeron-row","res-tax-erin-row"];
 if (tx) {
     taxRows.forEach(function(id){ document.getElementById(id).classList.remove("hidden"); });
-    var grossMo   = rawNum(document.getElementById("addition").value);
+    var grossMo    = rawNum(document.getElementById("addition").value);
     var afterTaxMo = grossMo - tx.monthly_tax;
     document.getElementById("res-tax-withdrawal").textContent = fmt(grossMo)+'/mo';
     document.getElementById("res-tax-owing").textContent      = '−'+fmt(tx.monthly_tax)+'/mo';
     document.getElementById("res-tax-aftertax").textContent   = fmt(afterTaxMo)+'/mo';
     document.getElementById("res-tax-rate").textContent       = pct(tx.eff_rate*100);
+    document.getElementById("res-tax-keeron").textContent     = fmt(tx.k_taxable)+' / '+fmt(tx.k_tax);
+    document.getElementById("res-tax-erin").textContent       = fmt(tx.e_taxable)+' / '+fmt(tx.e_tax);
     document.getElementById("tax-card-header").classList.add("active");
 } else {
     taxRows.forEach(function(id){ document.getElementById(id).classList.add("hidden"); });
     document.getElementById("tax-card-header").classList.toggle("active",!!scenarioData[activeScenario].taxEnabled);
-    }
+}
+
 }
 /* ─────────────────────────────────────────────
    CHART MODAL
