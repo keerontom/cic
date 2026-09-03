@@ -1239,8 +1239,9 @@ function switchScenario(newScenario) {
         scenarioData[newScenario].principal =
             bal.toLocaleString("en-CA",{maximumFractionDigits:2});
         /* Carry forward depleted per-person balances */
-        var prevTx = computeTaxEstimate(scenarioData[prev]);
+                var prevTx = computeTaxEstimate(scenarioData[prev]);
         if (prevTx) {
+            /* Withdrawal phase — use depleted balances from tax simulation */
             scenarioData[newScenario].port_k_tfsa =
                 Math.round(prevTx.end_k_tfsa).toLocaleString("en-CA");
             scenarioData[newScenario].port_k_rrsp =
@@ -1251,6 +1252,32 @@ function switchScenario(newScenario) {
                 Math.round(prevTx.end_e_tfsa).toLocaleString("en-CA");
             scenarioData[newScenario].port_e_rrsp =
                 Math.round(prevTx.end_e_rrsp).toLocaleString("en-CA");
+        } else {
+            /* Contribution phase (Now-55) — grow each account at the same
+               annual rate, then scale proportionally so the sum matches the
+               actual ending balance (which includes contributions). */
+            var pd   = scenarioData[prev];
+            var r_p  = (parseFloat(pd.rate)||0) / 100;
+            var t_p  = parseInt(pd.duration) || 0;
+            var g    = Math.pow(1 + r_p, t_p);
+            var k_t  = rawNum(pd.port_k_tfsa) * g;
+            var k_r  = rawNum(pd.port_k_rrsp) * g;
+            var k_n  = rawNum(pd.port_k_nrg)  * g;
+            var e_t  = rawNum(pd.port_e_tfsa) * g;
+            var e_r  = rawNum(pd.port_e_rrsp) * g;
+            var sum  = k_t + k_r + k_n + e_t + e_r;
+            /* Scale factor distributes contributions proportionally */
+            var sf   = sum > 0 ? bal / sum : 1;
+            scenarioData[newScenario].port_k_tfsa =
+                Math.round(k_t * sf).toLocaleString("en-CA");
+            scenarioData[newScenario].port_k_rrsp =
+                Math.round(k_r * sf).toLocaleString("en-CA");
+            scenarioData[newScenario].port_k_nrg  =
+                Math.round(k_n * sf).toLocaleString("en-CA");
+            scenarioData[newScenario].port_e_tfsa =
+                Math.round(e_t * sf).toLocaleString("en-CA");
+            scenarioData[newScenario].port_e_rrsp =
+                Math.round(e_r * sf).toLocaleString("en-CA");
         }
     }
     loadScenarioData(newScenario);
