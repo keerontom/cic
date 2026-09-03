@@ -415,12 +415,14 @@
                     </div>
                     <div class="tax-hdr-right">
                         <select id="draw-order-select" class="draw-order-select"
-                                onclick="event.stopPropagation()"
-                                onchange="calculate()">
-                            <option value="rrsp_first">RRSP First ★</option>
-                            <option value="tfsa_first">TFSA First</option>
-                            <option value="proportional">Proportional</option>
-                        </select>
+        onclick="event.stopPropagation()"
+        onchange="calculate()">
+    <option value="balanced">Balanced 50/50 ★</option>
+    <option value="rrsp_first">RRSP First</option>
+    <option value="tfsa_first">TFSA First</option>
+    <option value="proportional">Proportional</option>
+</select>
+
                         <span class="chevron" id="tax-details-chevron">▾</span>
                     </div>
                 </div>
@@ -685,7 +687,7 @@ var FALLBACKS = {
         qpp:"0", oas:"0", pension:"0",
         port_k_tfsa:"83,500", port_k_rrsp:"171,000", port_k_nrg:"392,000",
         port_e_tfsa:"83,500", port_e_rrsp:"340,000",
-        port_nrg_gain:"87", withdrawal_order:"rrsp_first",
+        port_nrg_gain:"87", withdrawal_order:"balanced",
         purchases: JSON.parse(JSON.stringify(EMPTY_PURCHASES))
     },
     bridge: {
@@ -694,7 +696,7 @@ var FALLBACKS = {
         qpp:"0", oas:"0", pension:"0",
         port_k_tfsa:"", port_k_rrsp:"", port_k_nrg:"",
         port_e_tfsa:"", port_e_rrsp:"",
-        port_nrg_gain:"87", withdrawal_order:"rrsp_first",
+        port_nrg_gain:"87", withdrawal_order:"balanced",
         purchases: JSON.parse(JSON.stringify(EMPTY_PURCHASES))
     },
     bridge2: {
@@ -703,7 +705,7 @@ var FALLBACKS = {
         qpp:"1,400", oas:"0", pension:"0",
         port_k_tfsa:"", port_k_rrsp:"", port_k_nrg:"",
         port_e_tfsa:"", port_e_rrsp:"",
-        port_nrg_gain:"87", withdrawal_order:"rrsp_first",
+        port_nrg_gain:"87", withdrawal_order:"balanced",
         purchases: JSON.parse(JSON.stringify(EMPTY_PURCHASES))
     },
     retirement: {
@@ -712,7 +714,7 @@ var FALLBACKS = {
         qpp:"1,400", oas:"1,400", pension:"2,000",
         port_k_tfsa:"", port_k_rrsp:"", port_k_nrg:"",
         port_e_tfsa:"", port_e_rrsp:"",
-        port_nrg_gain:"87", withdrawal_order:"rrsp_first",
+        port_nrg_gain:"87", withdrawal_order:"balanced",
         purchases: JSON.parse(JSON.stringify(EMPTY_PURCHASES))
     }
 };
@@ -966,25 +968,41 @@ function computeTaxEstimate(d) {
         var draw_k_tfsa = 0, draw_e_tfsa = 0;
         var draw_k_nrg  = 0;
         var rem = netAnnualDraw;
-        if (order === "rrsp_first") {
-            /* Correct order: RRSP → Non-Reg → TFSA (tax-free last) */
+                        if (order === "balanced") {
+            /* Each person targets exactly half the annual draw.
+               Keeron: RRSP → Non-Reg → TFSA
+               Erin:   RRSP → TFSA (no Non-Reg)
+               When one runs short their remaining comes from the next
+               account in their own sequence — not shifted to the other
+               person — preserving income equalization as long as possible. */
+            var target = rem / 2;
+            /* Keeron */
+            draw_k_rrsp = Math.min(cur_k_rrsp, target);
+            var k_rem   = target - draw_k_rrsp;
+            draw_k_nrg  = Math.min(cur_k_nrg,  k_rem);
+            k_rem      -= draw_k_nrg;
+            draw_k_tfsa = Math.min(cur_k_tfsa,  k_rem);
+            /* Erin */
+            draw_e_rrsp = Math.min(cur_e_rrsp, target);
+            var e_rem   = target - draw_e_rrsp;
+            draw_e_tfsa = Math.min(cur_e_tfsa,  e_rem);
+        } else if (order === "rrsp_first") {
+            /* Pool order: RRSP → Non-Reg → TFSA, split by balance share */
             var from_rrsp = Math.min(rem, total_rrsp);
             if (total_rrsp > 0) {
                 draw_k_rrsp = from_rrsp * (cur_k_rrsp / total_rrsp);
                 draw_e_rrsp = from_rrsp * (cur_e_rrsp / total_rrsp);
             }
             rem -= from_rrsp;
-            /* Non-Reg next (Keeron only — partially taxable) */
             draw_k_nrg = Math.min(rem, cur_k_nrg);
             rem -= draw_k_nrg;
-            /* TFSA last (completely tax-free — preserve longest) */
             var from_tfsa = Math.min(rem, total_tfsa);
             if (total_tfsa > 0) {
                 draw_k_tfsa = from_tfsa * (cur_k_tfsa / total_tfsa);
                 draw_e_tfsa = from_tfsa * (cur_e_tfsa / total_tfsa);
             }
         } else if (order === "tfsa_first") {
-            /* Correct order: TFSA → Non-Reg → RRSP */
+            /* Pool order: TFSA → Non-Reg → RRSP, split by balance share */
             var from_tfsa2 = Math.min(rem, total_tfsa);
             if (total_tfsa > 0) {
                 draw_k_tfsa = from_tfsa2 * (cur_k_tfsa / total_tfsa);
@@ -999,7 +1017,7 @@ function computeTaxEstimate(d) {
                 draw_e_rrsp = from_rrsp2 * (cur_e_rrsp / total_rrsp);
             }
         } else {
-            /* Proportional — draw from all accounts by relative weight */
+            /* Proportional — all accounts by relative weight */
             var total_all = (total_rrsp + total_tfsa + cur_k_nrg) || 1;
             draw_k_rrsp = netAnnualDraw * (cur_k_rrsp / total_all);
             draw_e_rrsp = netAnnualDraw * (cur_e_rrsp / total_all);
