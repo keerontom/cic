@@ -110,7 +110,7 @@
         td.control-cell { width: 60%; text-align: right; }
         .controls { display: flex; align-items: center; justify-content: flex-end; gap: 4px; width: 100%; }
         /* ── INPUTS ── */
-        .input-box { border: 1.5px solid #d1d1d6; border-radius: 8px; padding: 3px 6px; font-size: 15px; text-align: right; color: #1c1c1e; background: #fff; outline: none; height: 28px; width: 100%; min-width: 0; -webkit-appearance: none; }
+        .input-box { border: 1.5px solid #d1d1d6; border-radius: 8px; padding: 3px 6px; font-size: 15px; text-align: right; color: #1c1c1e; background: #fff; outline: none; height: 28px; width: 100%; min-width: 0; -webkit-appearance: none; touch-action: manipulation; -webkit-user-select: text; user-select: text; }
         .input-box:focus { border-color: #4a5568; }
         .input-box.medium { flex: 1; width: auto; }
         .input-box:disabled { background: #f5f5f7; color: #8e8e93; }
@@ -842,9 +842,20 @@ function toggleIncomeSection() {
 ───────────────────────────────────────────── */
 function togglePortfolio() {
     portfolioOpen = !portfolioOpen;
-    document.getElementById("portfolio-body").classList.toggle("hidden", !portfolioOpen);
+    var body = document.getElementById("portfolio-body");
+    body.classList.toggle("hidden", !portfolioOpen);
     document.getElementById("portfolio-chevron").classList.toggle("open", portfolioOpen);
+    /* iOS Safari fix: inputs inside initially-hidden containers need a
+       forced reflow after becoming visible or the keyboard won't appear */
+    if (portfolioOpen) {
+        requestAnimationFrame(function(){
+            body.querySelectorAll("input").forEach(function(el){
+                el.style.webkitUserSelect = "text";
+            });
+        });
+    }
 }
+
 function updatePortfolioFields() {
     var isWkg      = activeScenario === "working";
     var nrgInput   = document.getElementById("port-k-nrg");
