@@ -80,9 +80,9 @@
         .action-bar-btn.help-btn  { background: #e9d8fd; color: #553c9a; }
         /* ── CARDS ── */
         .card { background: #fff; border-radius: 10px; overflow: hidden; width: 100%; box-shadow: 0 1px 5px rgba(0,0,0,.1); flex-shrink: 0; }
+        .card.faded { opacity: 0.42; pointer-events: none; }
         .card-header { background: #4a5568; color: #fff; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 5px 10px; }
         .card-header.defaults-header { background: #2d3748; }
-        .card.faded { opacity: 0.42; pointer-events: none; }
         /* ── UNIFIED COLLAPSIBLE HEADER ── */
         .collapsible-header {
             display: flex; justify-content: space-between; align-items: center;
@@ -90,9 +90,9 @@
             text-transform: uppercase; padding: 5px 10px; line-height: 1.4;
             cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent;
         }
-        .collapsible-header.income-hdr  { background: #2b6cb0; color: #fff; }
-        .collapsible-header.costs-hdr   { background: #744210; color: #fff; }
-        .collapsible-header.tax-hdr        { background: #c05621; color: #fff; }
+        .collapsible-header.income-hdr { background: #2b6cb0; color: #fff; }
+        .collapsible-header.costs-hdr  { background: #c05621; color: #fff; }
+        .collapsible-header.tax-hdr    { background: #c05621; color: #fff; }
         .collapsible-header.tax-hdr.active { background: #9c4221; }
         .chevron { font-size: 10px; display: inline-block; transition: transform 0.2s; line-height: 1; }
         .chevron.open { transform: rotate(180deg); }
@@ -136,7 +136,7 @@
         .tax-divider-row { background: #fffbeb; border-bottom: 1px solid #fbd38d; }
         .tax-divider-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #744210; }
         .tax-divider-note  { font-size: 9px; color: #a0522d; font-style: italic; }
-        .nrg-pct-display   { font-size: 15px; font-weight: 600; color: #8e8e93; text-align: right; padding: 0 8px; }
+        .nrg-pct-display   { font-size: 14px; font-weight: 600; color: #8e8e93; text-align: right; padding: 0 8px; }
         /* ── DEFAULTS ── */
         .defaults-actions { display: flex; gap: 8px; width: 100%; padding: 4px 0 0; }
         .action-btn { flex: 1; height: 38px; border: none; border-radius: 9px; font-size: 13px; font-weight: 600; cursor: pointer; }
@@ -211,14 +211,14 @@
     <!-- TOP TABS -->
     <div class="tabs">
         <button class="tab-btn calc-tab active"  onclick="switchTopTab('calculator')">Calculator</button>
-        <button class="tab-btn ledger-tab"       onclick="switchTopTab('ledger')">Ledger</button>
-        <button class="tab-btn defaults-tab"     onclick="switchTopTab('defaults')">Defaults</button>
-        <button class="reset-btn"                onclick="resetCalculator()">↺</button>
+        <button class="tab-btn ledger-tab"        onclick="switchTopTab('ledger')">Ledger</button>
+        <button class="tab-btn defaults-tab"      onclick="switchTopTab('defaults')">Defaults</button>
+        <button class="reset-btn"                 onclick="resetCalculator()">↺</button>
     </div>
     <!-- CALCULATOR PANEL -->
     <div id="panel-calculator" class="tab-content">
         <div class="calc-scroll" id="calc-scroll">
-            <!-- CALCULATOR CARD — closes after "Add at" -->
+            <!-- CALCULATOR CARD -->
             <div class="card">
                 <div class="card-header">Calculator</div>
                 <table class="input-table">
@@ -282,9 +282,8 @@
                     </tr>
                 </table>
             </div>
-            <!-- END CALCULATOR CARD -->
-            <!-- GOV'T & PENSION INCOME — standalone card, hidden until bridge2/retirement -->
-            <div class="card hidden" id="income-card">
+            <!-- GOV'T & PENSION INCOME — always visible, faded when N/A -->
+            <div class="card" id="income-card">
                 <div class="collapsible-header income-hdr" onclick="toggleIncomeSection()">
                     <span>Gov't &amp; Pension Income (monthly)</span>
                     <span class="chevron" id="income-chevron">▾</span>
@@ -295,20 +294,20 @@
                             <td class="label-cell">QPP (combined)</td>
                             <td class="control-cell"><input type="text" id="income-qpp" class="input-box income-input" inputmode="decimal" placeholder="0.00"></td>
                         </tr>
-                        <tr id="income-oas-row" class="hidden">
+                        <tr id="income-oas-row">
                             <td class="label-cell">OAS (combined)</td>
                             <td class="control-cell"><input type="text" id="income-oas" class="input-box income-input" inputmode="decimal" placeholder="0.00"></td>
                         </tr>
-                        <tr id="income-pension-row" class="hidden">
+                        <tr id="income-pension-row">
                             <td class="label-cell">Pension (Erin)</td>
                             <td class="control-cell"><input type="text" id="income-pension" class="input-box income-input" inputmode="decimal" placeholder="0.00"></td>
                         </tr>
                     </table>
                 </div>
             </div>
-            <!-- ONE-TIME COSTS — standalone card, injected by JS -->
+            <!-- ONE-TIME COSTS — injected by JS -->
             <div id="costs-card-placeholder"></div>
-            <!-- TAX PROFILE — standalone card -->
+            <!-- TAX PROFILE -->
             <div class="card" id="tax-profile-card">
                 <div class="collapsible-header tax-hdr" id="tax-card-header" onclick="toggleTaxCard()">
                     <span>Tax Profile — Keeron &amp; Erin</span>
@@ -321,16 +320,16 @@
                             <td class="control-cell"><button class="toggle-btn tax-toggle" id="tax-enabled-btn" onclick="toggleTaxEnabled()">OFF</button></td>
                         </tr>
                         <tr id="tax-tfsa-row" class="hidden">
-                            <td class="label-cell">TFSA %</td>
-                            <td class="control-cell"><input type="number" id="tax-tfsa" class="input-box tax-input" step="1" min="0" max="100" inputmode="numeric"></td>
+                            <td class="label-cell">TFSA $</td>
+                            <td class="control-cell"><input type="text" id="tax-tfsa" class="input-box tax-input" inputmode="decimal" placeholder="0"></td>
                         </tr>
                         <tr id="tax-rrsp-row" class="hidden">
-                            <td class="label-cell">RRSP %</td>
-                            <td class="control-cell"><input type="number" id="tax-rrsp" class="input-box tax-input" step="1" min="0" max="100" inputmode="numeric"></td>
+                            <td class="label-cell">RRSP $</td>
+                            <td class="control-cell"><input type="text" id="tax-rrsp" class="input-box tax-input" inputmode="decimal" placeholder="0"></td>
                         </tr>
                         <tr id="tax-nrg-row" class="hidden">
-                            <td class="label-cell">Non-Reg %</td>
-                            <td class="control-cell"><span class="nrg-pct-display" id="tax-nrg-display">35%</span></td>
+                            <td class="label-cell">Non-Reg $</td>
+                            <td class="control-cell"><span class="nrg-pct-display" id="tax-nrg-display">$0</span></td>
                         </tr>
                         <tr id="tax-gain-row" class="hidden">
                             <td class="label-cell">NR Gain %</td>
@@ -384,34 +383,35 @@
                     <span class="result-label sub" id="res-real-label">Real Value (today's $) @ 3.00% inflation</span>
                     <span id="res-real" class="result-value real">$0.00</span>
                 </div>
+                <!-- TAX ESTIMATE BLOCK -->
                 <div class="result-row tax-divider-row hidden" id="res-tax-divider">
-    <span class="tax-divider-label">Tax Estimate</span>
-    <span class="tax-divider-note">Fed + Quebec · 2024 brackets</span>
-</div>
-<div class="result-row hidden" id="res-tax-withdrawal-row">
-    <span class="result-label sub">Monthly Withdrawal</span>
-    <span id="res-tax-withdrawal" class="result-value" style="font-size:13px">$0/mo</span>
-</div>
-<div class="result-row hidden" id="res-tax-owing-row">
-    <span class="result-label sub">Est. Tax Owing / mo</span>
-    <span id="res-tax-owing" class="result-value cost" style="font-size:13px">−$0/mo</span>
-</div>
-<div class="result-row hidden" id="res-tax-aftertax-row">
-    <span class="result-label">After-Tax Monthly</span>
-    <span id="res-tax-aftertax" class="result-value highlight">$0/mo</span>
-</div>
-<div class="result-row hidden" id="res-tax-rate-row">
-    <span class="result-label sub">Effective Tax Rate</span>
-    <span id="res-tax-rate" class="result-value tax-val" style="font-size:12px">0%</span>
-</div>
-<div class="result-row hidden" id="res-tax-keeron-row">
-    <span class="result-label sub">Keeron — Taxable / Tax</span>
-    <span id="res-tax-keeron" class="result-value" style="font-size:11px;color:#744210">$0 / $0</span>
-</div>
-<div class="result-row hidden" id="res-tax-erin-row">
-    <span class="result-label sub">Erin — Taxable / Tax</span>
-    <span id="res-tax-erin" class="result-value" style="font-size:11px;color:#744210">$0 / $0</span>
-</div>
+                    <span class="tax-divider-label">Tax Estimate</span>
+                    <span class="tax-divider-note">Fed + Quebec · 2024 brackets · avg over phase</span>
+                </div>
+                <div class="result-row hidden" id="res-tax-withdrawal-row">
+                    <span class="result-label sub">Monthly Withdrawal</span>
+                    <span id="res-tax-withdrawal" class="result-value" style="font-size:13px">$0/mo</span>
+                </div>
+                <div class="result-row hidden" id="res-tax-owing-row">
+                    <span class="result-label sub">Est. Tax Owing / mo</span>
+                    <span id="res-tax-owing" class="result-value cost" style="font-size:13px">−$0/mo</span>
+                </div>
+                <div class="result-row hidden" id="res-tax-aftertax-row">
+                    <span class="result-label">After-Tax Monthly</span>
+                    <span id="res-tax-aftertax" class="result-value highlight">$0/mo</span>
+                </div>
+                <div class="result-row hidden" id="res-tax-rate-row">
+                    <span class="result-label sub">Effective Tax Rate</span>
+                    <span id="res-tax-rate" class="result-value tax-val" style="font-size:12px">0%</span>
+                </div>
+                <div class="result-row hidden" id="res-tax-keeron-row">
+                    <span class="result-label sub">Keeron — Taxable / Tax</span>
+                    <span id="res-tax-keeron" class="result-value" style="font-size:11px;color:#744210">$0 / $0</span>
+                </div>
+                <div class="result-row hidden" id="res-tax-erin-row">
+                    <span class="result-label sub">Erin — Taxable / Tax</span>
+                    <span id="res-tax-erin" class="result-value" style="font-size:11px;color:#744210">$0 / $0</span>
+                </div>
             </div>
         </div>
     </div>
@@ -550,7 +550,7 @@
             <div class="help-item"><div class="help-field">Inflation % &amp; ADJ toggle</div><div class="help-desc">Inflation is how much prices rise each year — set to 3% here as a default. When the ADJ toggle is ON, your monthly withdrawals automatically increase each year to keep up with inflation. When OFF, withdrawals stay the same dollar amount throughout.</div><div class="help-tip">💡 Turning ADJ ON is more realistic — $9,000 today won't feel like $9,000 in 10 years.</div></div>
             <div class="help-item"><div class="help-field">Compounding</div><div class="help-desc">How often your interest is calculated and added to your balance. Monthly is the most common and most accurate for most investment accounts.</div></div>
             <div class="help-item"><div class="help-field">Duration (Years)</div><div class="help-desc">How many years this phase lasts. The phases are pre-set: Now–55 is 4 years, 55–60 and 60–65 are 5 years each, and retirement (65+) is 35 years.</div></div>
-            <div class="help-item"><div class="help-field">Gross Monthly (+ or −)</div><div class="help-desc">The amount of money going into or out of the portfolio each month. Press the + / − button to switch between contributing (saving) and withdrawing (spending from savings). During retirement phases this is your household spending target before taxes.</div><div class="help-tip">💡 "Gross" means before tax. The Tax Profile card helps estimate how much more you'd actually need to withdraw to end up with your target after tax.</div></div>
+            <div class="help-item"><div class="help-field">Gross Monthly (+ or −)</div><div class="help-desc">The amount of money going into or out of the portfolio each month. Press the + / − button to switch between contributing (saving) and withdrawing (spending from savings). During retirement phases this is your household spending target before taxes.</div><div class="help-tip">💡 "Gross" means before tax. The Tax Profile card estimates how much tax you'll owe on this withdrawal, and shows what actually lands in your account after.</div></div>
             <div class="help-item"><div class="help-field">Add at (Start / End of period)</div><div class="help-desc">Whether the withdrawal or contribution happens at the beginning or end of each compounding period. "Start of period" is slightly more conservative for withdrawals.</div></div>
             <div class="help-item"><div class="help-field">One-Time Costs</div><div class="help-desc">Up to 5 large one-time expenses — like a renovation, a car, or a trip — each taken out of the portfolio at a specific month and year. Tap the header to expand, toggle each cost ON, enter the amount, and set when it happens.</div><div class="help-tip">💡 You can have multiple costs in the same year or spread across different years.</div></div>
         </div>
@@ -562,13 +562,13 @@
         </div>
         <div class="help-section">
             <div class="help-section-title">💛 Tax Profile — Keeron &amp; Erin</div>
-            <div class="help-item"><div class="help-field">Tax Modelling (ON / OFF)</div><div class="help-desc">Turns the tax estimate on or off. When ON, the calculator estimates how much federal and Quebec income tax you'd owe based on where your money is coming from. Only available during withdrawal phases.</div></div>
-            <div class="help-item"><div class="help-field">TFSA %</div><div class="help-desc">What percentage of your total combined savings is in Tax-Free Savings Accounts. Money withdrawn from a TFSA is completely tax-free. Currently ~20% of your total portfolio (about $218,000 combined).</div></div>
-            <div class="help-item"><div class="help-field">RRSP %</div><div class="help-desc">What percentage of your total savings is in RRSPs. Every dollar withdrawn from an RRSP counts as fully taxable income. Keeron has $171,000 and Erin has $340,000 in RRSPs, making up about 45% of the total.</div><div class="help-tip">💡 Best strategy: draw down RRSP early (55–60) while your income is lowest, before QPP and OAS push you into higher tax brackets.</div></div>
-            <div class="help-item"><div class="help-field">Non-Reg % (auto)</div><div class="help-desc">The remaining percentage — Keeron's regular investment account ($393,000). Only the profit (gain) portion is taxable, and even then only half counts as income under Canada's capital gains rules.</div></div>
-            <div class="help-item"><div class="help-field">NR Gain %</div><div class="help-desc">Of Keeron's non-registered investments, what percentage is profit vs. the original amount paid. Keeron originally invested $50,000 and it's now worth $393,000 — about 87% is gain. Only half of that gain gets added to taxable income.</div></div>
-            <div class="help-item"><div class="help-field">Keeron Draw %</div><div class="help-desc">What share of each monthly withdrawal is attributed to Keeron vs Erin for tax purposes. Splitting income between two people almost always results in a lower combined tax bill than one person taking everything.</div></div>
-            <div class="help-item"><div class="help-field">Draw Order</div><div class="help-desc">"RRSP First ★" draws from RRSPs before TFSAs — the smartest approach for most people in early retirement when income is lowest. Reduces the RRSP balance before mandatory withdrawals kick in at age 71.</div></div>
+            <div class="help-item"><div class="help-field">Tax Modelling (ON / OFF)</div><div class="help-desc">Turns the tax estimate on or off. When ON, the calculator simulates year-by-year account depletion based on your draw order and computes the blended average tax across the entire phase. Only available during withdrawal phases.</div></div>
+            <div class="help-item"><div class="help-field">TFSA $</div><div class="help-desc">The actual combined dollar balance in your Tax-Free Savings Accounts. Money withdrawn from a TFSA is completely tax-free. When you move to the next phase, the remaining TFSA balance carries forward automatically.</div></div>
+            <div class="help-item"><div class="help-field">RRSP $</div><div class="help-desc">The actual combined dollar balance in your RRSPs (Keeron + Erin). Every dollar withdrawn from an RRSP counts as fully taxable income. The remaining balance carries forward to the next phase based on how much was drawn.</div><div class="help-tip">💡 Best strategy: draw down RRSP early (55–60) while your income is lowest, before QPP and OAS push you into higher tax brackets.</div></div>
+            <div class="help-item"><div class="help-field">Non-Reg $</div><div class="help-desc">Auto-calculated as Principal minus TFSA minus RRSP. This is the non-registered investment account balance (Keeron's). Only the profit (gain) portion is taxable, and only 50% of capital gains count as income.</div></div>
+            <div class="help-item"><div class="help-field">NR Gain %</div><div class="help-desc">Of the Non-Registered balance, what percentage is profit vs. the original amount invested. Only half of the gain is added to taxable income under Canada's capital gains rules.</div></div>
+            <div class="help-item"><div class="help-field">Keeron Draw %</div><div class="help-desc">What share of each monthly withdrawal is attributed to Keeron vs Erin for tax purposes. Splitting income between two people almost always results in a lower combined tax bill.</div></div>
+            <div class="help-item"><div class="help-field">Draw Order</div><div class="help-desc">Controls which account type gets drawn from first each year. RRSP First depletes the RRSP before touching TFSA or Non-Reg. TFSA First keeps taxable income low. Proportional draws from all three simultaneously based on their relative balances. The simulation tracks actual depletion year by year.</div><div class="help-tip">💡 RRSP First ★ is optimal in early retirement — it clears the most tax-expensive account while your income bracket is still low.</div></div>
         </div>
         <div class="help-section">
             <div class="help-section-title">📊 Results Card</div>
@@ -577,9 +577,10 @@
             <div class="help-item"><div class="help-field">Net Monthly Draw on Savings</div><div class="help-desc">After subtracting income offsets, this is the actual amount coming out of your investment portfolio each month.</div></div>
             <div class="help-item"><div class="help-field">Ending Balance</div><div class="help-desc">How much money is left in your combined portfolio at the end of this phase. Automatically becomes the starting balance for the next phase.</div></div>
             <div class="help-item"><div class="help-field">Real Value (today's $)</div><div class="help-desc">The ending balance expressed in today's purchasing power. Tells you what your future balance is really worth in current dollars.</div></div>
-            <div class="help-item"><div class="help-field">Est. Tax Owing / mo</div><div class="help-desc">Your share of combined federal and Quebec income tax for the month, based on your withdrawal amount and account mix (TFSA, RRSP, Non-Reg). This comes directly out of your monthly withdrawal — the portfolio balance is not affected.</div></div>
+            <div class="help-item"><div class="help-field">Est. Tax Owing / mo</div><div class="help-desc">Your estimated monthly tax bill — averaged across the entire phase — based on how much is drawn from each account type (RRSP, TFSA, Non-Reg) and your income split. Uses 2024 federal + Quebec brackets.</div></div>
             <div class="help-item"><div class="help-field">After-Tax Monthly</div><div class="help-desc">What actually lands in your bank account after taxes are paid. This is your withdrawal minus the estimated tax owing — the real spending money available each month.</div><div class="help-tip">💡 Example: $10,000 withdrawal at 17.7% effective rate = $8,230/mo after tax.</div></div>
-            <div class="help-item"><div class="help-field">Effective Tax Rate</div><div class="help-desc">The blended tax rate across your entire withdrawal — a weighted average across TFSA (0% tax), RRSP (fully taxable), and Non-Reg (capital gains at 50%) portions, split between Keeron and Erin.</div></div>
+            <div class="help-item"><div class="help-field">Effective Tax Rate</div><div class="help-desc">The blended average tax rate across the phase — weighted across TFSA (0%), RRSP (fully taxable), and Non-Reg (50% of gains), split between Keeron and Erin.</div></div>
+            <div class="help-item"><div class="help-field">Keeron / Erin — Taxable &amp; Tax</div><div class="help-desc">Year-1 taxable income and average annual tax for each person individually, so you can see how the income split and draw order affect each person's tax situation.</div></div>
         </div>
         <div class="help-section">
             <div class="help-section-title">🗂️ Life Phase Tabs</div>
@@ -618,8 +619,8 @@ function pct(n) { return (Math.round(n*10)/10).toFixed(1)+'%'; }
 /* ─────────────────────────────────────────────
    CONSTANTS & STATE
 ───────────────────────────────────────────── */
-var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-var SCENARIOS       = ["working","bridge","bridge2","retirement"];
+var MONTHS       = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+var SCENARIOS    = ["working","bridge","bridge2","retirement"];
 var SCENARIO_ORDER  = { working:0, bridge:1, bridge2:2, retirement:3 };
 var SCENARIO_LABELS = { working:"Now – 55", bridge:"55 – 60", bridge2:"60 – 65", retirement:"65+" };
 var inflAdj           = (localStorage.getItem("global_inflAdj") === "true");
@@ -642,34 +643,38 @@ var EMPTY_PURCHASES = [
 ];
 var FALLBACKS = {
     working: {
-        principal:"1,200,000", rate:"7.00", inflation:"2.75", compound:"12",
+        principal:"1,070,000", rate:"7.00", inflation:"3.00", compound:"12",
         duration:"4", addition:"1,000", addFreq:"12", addTiming:"start", addSign:1,
         qpp:"0", oas:"0", pension:"0",
-        taxEnabled:false, tfsa_pct:"20", rrsp_pct:"45", nrg_gain:"87",
+        taxEnabled:false,
+        tfsa_bal:"167,000", rrsp_bal:"511,000", nrg_gain:"87",
         keeron_split:"50", withdrawal_order:"rrsp_first",
         purchases: JSON.parse(JSON.stringify(EMPTY_PURCHASES))
     },
     bridge: {
-        principal:"", rate:"6.00", inflation:"2.75", compound:"12",
+        principal:"", rate:"6.00", inflation:"3.00", compound:"12",
         duration:"5", addition:"10,000", addFreq:"12", addTiming:"start", addSign:-1,
         qpp:"0", oas:"0", pension:"0",
-        taxEnabled:false, tfsa_pct:"20", rrsp_pct:"45", nrg_gain:"87",
+        taxEnabled:false,
+        tfsa_bal:"", rrsp_bal:"", nrg_gain:"87",
         keeron_split:"50", withdrawal_order:"rrsp_first",
         purchases: JSON.parse(JSON.stringify(EMPTY_PURCHASES))
     },
     bridge2: {
-        principal:"", rate:"5.50", inflation:"2.75", compound:"12",
+        principal:"", rate:"5.50", inflation:"3.00", compound:"12",
         duration:"5", addition:"9,000", addFreq:"12", addTiming:"start", addSign:-1,
         qpp:"1,400", oas:"0", pension:"0",
-        taxEnabled:false, tfsa_pct:"20", rrsp_pct:"45", nrg_gain:"87",
+        taxEnabled:false,
+        tfsa_bal:"", rrsp_bal:"", nrg_gain:"87",
         keeron_split:"50", withdrawal_order:"rrsp_first",
         purchases: JSON.parse(JSON.stringify(EMPTY_PURCHASES))
     },
     retirement: {
-        principal:"", rate:"4.50", inflation:"2.75", compound:"12",
+        principal:"", rate:"4.50", inflation:"3.00", compound:"12",
         duration:"35", addition:"8,000", addFreq:"12", addTiming:"start", addSign:-1,
         qpp:"1,400", oas:"1,400", pension:"2,000",
-        taxEnabled:false, tfsa_pct:"20", rrsp_pct:"45", nrg_gain:"87",
+        taxEnabled:false,
+        tfsa_bal:"", rrsp_bal:"", nrg_gain:"87",
         keeron_split:"50", withdrawal_order:"rrsp_first",
         purchases: JSON.parse(JSON.stringify(EMPTY_PURCHASES))
     }
@@ -698,11 +703,12 @@ var PRINT_HDR_COLORS = {
 var _modalChart   = null;
 var _chartAllData = null;
 /* ─────────────────────────────────────────────
-   ONE-TIME COSTS — BUILD STANDALONE CARD
+   ONE-TIME COSTS — STANDALONE CARD
 ───────────────────────────────────────────── */
 function buildCostCard() {
-    var mo = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-    var moOpts = mo.map(function(m,i){ return '<option value="'+(i+1)+'">'+m+'</option>'; }).join('');
+    var moOpts = MONTHS.map(function(m,i){
+        return '<option value="'+(i+1)+'">'+m+'</option>';
+    }).join('');
     var html = '<div class="card" id="costs-card">'+
         '<div class="collapsible-header costs-hdr" onclick="toggleCostsSection()">'+
         '<span>One-Time Costs</span>'+
@@ -731,7 +737,6 @@ function toggleCostsSection() {
     costsSectionOpen = !costsSectionOpen;
     document.getElementById("costs-chevron").classList.toggle("open", costsSectionOpen);
     document.getElementById("costs-body").classList.toggle("hidden", !costsSectionOpen);
-    /* Hide individual "when" rows if their toggle is off */
     for (var i = 1; i <= 5; i++) {
         var isOn = document.getElementById("cost-toggle-"+i).classList.contains("active");
         document.getElementById("cost-when-"+i).classList.toggle("hidden", !isOn);
@@ -777,17 +782,15 @@ function updateIncomeCardVisibility() {
     var active = isB2 || isRet;
     var card = document.getElementById("income-card");
     var hdr  = card.querySelector(".collapsible-header span:first-child");
-    /* Always visible — faded + locked when not applicable */
     card.classList.remove("hidden");
     card.classList.toggle("faded", !active);
-    /* Update title */
     hdr.textContent = active
         ? "Gov\u2019t & Pension Income (monthly)"
         : "Gov\u2019t & Pension Income \u2014 N/A";
-    /* OAS and pension only in retirement */
+    /* OAS + pension only in retirement */
     document.getElementById("income-oas-row").classList.toggle("hidden",     !isRet);
     document.getElementById("income-pension-row").classList.toggle("hidden", !isRet);
-    /* Collapse body when switching scenarios */
+    /* Collapse body on scenario switch */
     document.getElementById("income-body").classList.add("hidden");
     document.getElementById("income-chevron").classList.remove("open");
     incomeSectionOpen = false;
@@ -817,15 +820,18 @@ function toggleTaxEnabled() {
 function updateTaxInputRows() {
     var d  = scenarioData[activeScenario];
     var on = d.taxEnabled && (d.addSign||1) === -1;
-    ["tax-tfsa-row","tax-rrsp-row","tax-nrg-row","tax-gain-row","tax-split-row","tax-order-row"].forEach(function(r){
+    ["tax-tfsa-row","tax-rrsp-row","tax-nrg-row","tax-gain-row",
+     "tax-split-row","tax-order-row"].forEach(function(r){
         document.getElementById(r).classList.toggle("hidden", !on);
     });
     if (on) updateNrgDisplay();
 }
 function updateNrgDisplay() {
-    var tfsa = parseFloat(document.getElementById("tax-tfsa").value)||0;
-    var rrsp = parseFloat(document.getElementById("tax-rrsp").value)||0;
-    document.getElementById("tax-nrg-display").textContent = Math.max(0,100-tfsa-rrsp).toFixed(0)+'%';
+    var tfsa = rawNum(document.getElementById("tax-tfsa").value);
+    var rrsp = rawNum(document.getElementById("tax-rrsp").value);
+    var P    = rawNum(document.getElementById("principal").value);
+    var nrg  = Math.max(0, P - tfsa - rrsp);
+    document.getElementById("tax-nrg-display").textContent = fmt(nrg);
 }
 /* ─────────────────────────────────────────────
    CPI TOGGLE
@@ -865,55 +871,91 @@ function computeTaxEstimate(d) {
     if (!d.taxEnabled) return null;
     var isWdr = (d.addSign || 1) === -1;
     if (!isWdr) return null;
-    var grossMonthly = rawNum(d.addition);
-    var grossAnnual  = grossMonthly * 12;
-    var tfsa_f  = Math.min(1, Math.max(0, (parseFloat(d.tfsa_pct)||0) / 100));
-    var rrsp_f  = Math.min(1, Math.max(0, (parseFloat(d.rrsp_pct)||0) / 100));
-    var nrg_f   = Math.max(0, 1 - tfsa_f - rrsp_f);
+    var grossMonthly  = rawNum(d.addition);
+    var grossAnnual   = grossMonthly * 12;
+    var r = (parseFloat(d.rate)||0) / 100;
+    var t = Math.max(1, parseInt(d.duration)||1);
+    /* Starting account balances */
+    var P        = rawNum(d.principal);
+    var tfsa_bal = rawNum(d.tfsa_bal);
+    var rrsp_bal = rawNum(d.rrsp_bal);
+    var nrg_bal  = Math.max(0, P - tfsa_bal - rrsp_bal);
     var gain_f  = Math.min(1, Math.max(0, (parseFloat(d.nrg_gain)||0) / 100));
     var k_split = Math.min(1, Math.max(0, (parseFloat(d.keeron_split)||50) / 100));
     var e_split = 1 - k_split;
     var order   = d.withdrawal_order || "rrsp_first";
-    /* Apply draw order — each bucket is capped at its portfolio allocation */
-    var rrsp_avail = grossAnnual * rrsp_f;
-    var tfsa_avail = grossAnnual * tfsa_f;
-    var draw_rrsp, draw_tfsa, draw_nrg, rem;
-    if (order === "rrsp_first") {
-        draw_rrsp = Math.min(grossAnnual, rrsp_avail);
-        rem       = grossAnnual - draw_rrsp;
-        draw_tfsa = Math.min(rem, tfsa_avail);
-        draw_nrg  = rem - draw_tfsa;
-    } else if (order === "tfsa_first") {
-        draw_tfsa = Math.min(grossAnnual, tfsa_avail);
-        rem       = grossAnnual - draw_tfsa;
-        draw_rrsp = Math.min(rem, rrsp_avail);
-        draw_nrg  = rem - draw_rrsp;
-    } else {
-        /* proportional */
-        draw_rrsp = rrsp_avail;
-        draw_tfsa = grossAnnual * tfsa_f;
-        draw_nrg  = grossAnnual * nrg_f;
+    /* Income offsets — reduce net draw from investment accounts */
+    var qpp_annual    = rawNum(d.qpp) * 12;
+    var oas_annual    = rawNum(d.oas) * 12;
+    var pen_annual    = rawNum(d.pension) * 12;
+    var income_annual = qpp_annual + oas_annual + pen_annual;
+    var k_fixed       = (qpp_annual + oas_annual) * 0.5;
+    var e_fixed       = (qpp_annual + oas_annual) * 0.5 + pen_annual;
+    /* Net annual draw needed from investment accounts */
+    var netAnnualDraw = Math.max(0, grossAnnual - income_annual);
+    var cur_tfsa = tfsa_bal;
+    var cur_rrsp = rrsp_bal;
+    var cur_nrg  = nrg_bal;
+    var y1_k_taxable = 0, y1_e_taxable = 0;
+    var total_k_tax  = 0, total_e_tax  = 0;
+    for (var yr = 0; yr < t; yr++) {
+        /* Grow each account at the annual rate */
+        cur_tfsa *= (1 + r);
+        cur_rrsp *= (1 + r);
+        cur_nrg  *= (1 + r);
+        /* Apply draw order — drain priority account first */
+        var rem = netAnnualDraw;
+        var draw_rrsp = 0, draw_tfsa = 0, draw_nrg = 0;
+        if (order === "rrsp_first") {
+            draw_rrsp = Math.min(rem, cur_rrsp); rem -= draw_rrsp;
+            draw_tfsa = Math.min(rem, cur_tfsa); rem -= draw_tfsa;
+            draw_nrg  = Math.min(rem, cur_nrg);
+        } else if (order === "tfsa_first") {
+            draw_tfsa = Math.min(rem, cur_tfsa); rem -= draw_tfsa;
+            draw_rrsp = Math.min(rem, cur_rrsp); rem -= draw_rrsp;
+            draw_nrg  = Math.min(rem, cur_nrg);
+        } else {
+            /* Proportional — draw from all three by relative weight */
+            var total_bal = (cur_rrsp + cur_tfsa + cur_nrg) || 1;
+            draw_rrsp = netAnnualDraw * (cur_rrsp / total_bal);
+            draw_tfsa = netAnnualDraw * (cur_tfsa / total_bal);
+            draw_nrg  = netAnnualDraw * (cur_nrg  / total_bal);
+        }
+        /* Deplete balances */
+        cur_rrsp = Math.max(0, cur_rrsp - draw_rrsp);
+        cur_tfsa = Math.max(0, cur_tfsa - draw_tfsa);
+        cur_nrg  = Math.max(0, cur_nrg  - draw_nrg);
+        /* Tax: RRSP fully taxable, NRG 50% of gain only, TFSA tax-free */
+        var nrg_taxable  = draw_nrg * gain_f * 0.5;
+        var port_taxable = draw_rrsp + nrg_taxable;
+        var k_taxable    = k_fixed + port_taxable * k_split;
+        var e_taxable    = e_fixed + port_taxable * e_split;
+        var k_tax_yr     = computePersonTax(k_taxable);
+        var e_tax_yr     = computePersonTax(e_taxable);
+        if (yr === 0) {
+            y1_k_taxable = k_taxable;
+            y1_e_taxable = e_taxable;
+        }
+        total_k_tax += k_tax_yr;
+        total_e_tax += e_tax_yr;
     }
-    var nrg_taxable_total = draw_nrg * gain_f * 0.5;
-    var portfolio_taxable = draw_rrsp + nrg_taxable_total;
-    var qpp_annual = rawNum(d.qpp) * 12;
-    var oas_annual = rawNum(d.oas) * 12;
-    var pen_annual = rawNum(d.pension) * 12;
-    var k_fixed    = (qpp_annual + oas_annual) * 0.5;
-    var e_fixed    = (qpp_annual + oas_annual) * 0.5 + pen_annual;
-    var k_taxable = k_fixed + portfolio_taxable * k_split;
-    var e_taxable = e_fixed + portfolio_taxable * e_split;
-    var k_tax     = computePersonTax(k_taxable);
-    var e_tax     = computePersonTax(e_taxable);
-    var total_tax = k_tax + e_tax;
-    var eff_rate  = grossAnnual > 0 ? total_tax / grossAnnual : 0;
-    return { k_taxable:k_taxable, e_taxable:e_taxable,
-             k_tax:k_tax, e_tax:e_tax,
-             total_tax:total_tax, eff_rate:eff_rate,
-             monthly_tax:total_tax/12,
-             draw_rrsp:draw_rrsp, draw_tfsa:draw_tfsa, draw_nrg:draw_nrg };
+    var avg_k_tax = total_k_tax / t;
+    var avg_e_tax = total_e_tax / t;
+    var avg_total = avg_k_tax + avg_e_tax;
+    var eff_rate  = grossAnnual > 0 ? avg_total / grossAnnual : 0;
+    return {
+        k_taxable:   y1_k_taxable,
+        e_taxable:   y1_e_taxable,
+        k_tax:       avg_k_tax,
+        e_tax:       avg_e_tax,
+        total_tax:   avg_total,
+        eff_rate:    eff_rate,
+        monthly_tax: avg_total / 12,
+        end_rrsp:    cur_rrsp,
+        end_tfsa:    cur_tfsa,
+        end_nrg:     cur_nrg
+    };
 }
-
 /* ─────────────────────────────────────────────
    CORE MATH
 ───────────────────────────────────────────── */
@@ -934,12 +976,14 @@ function buildActivePurchases(purchases, n) {
         if (!pu.enabled || !rawNum(pu.amount)) return null;
         var pYr  = parseInt(pu.year)  || 1;
         var pMon = parseInt(pu.month) || 1;
-        return { amount:rawNum(pu.amount), period:(pYr-1)*n+Math.floor((pMon-1)*n/12),
+        return { amount:rawNum(pu.amount),
+                 period:(pYr-1)*n+Math.floor((pMon-1)*n/12),
                  applied:false, month:pMon, year:pYr };
     }).filter(function(x){ return x !== null; });
 }
 function computeLedger(d, overridePrincipal) {
-    var P       = (overridePrincipal!==null&&overridePrincipal!==undefined) ? overridePrincipal : rawNum(d.principal);
+    var P       = (overridePrincipal!==null&&overridePrincipal!==undefined)
+                  ? overridePrincipal : rawNum(d.principal);
     var r       = (parseFloat(d.rate)||0)/100;
     var infl    = (parseFloat(d.inflation)||0)/100;
     var n       = parseInt(d.compound)||1;
@@ -957,8 +1001,11 @@ function computeLedger(d, overridePrincipal) {
         for (var p=0; p<n; p++) {
             var sp = scaledPmt(pmtPP,inflPP,gPeriod)+incPP;
             var interest;
-            if (timing==="start"){ bal+=sp; yAdd+=sp; interest=bal*rPP; bal+=interest; yInt+=interest; }
-            else { interest=bal*rPP; bal+=interest; yInt+=interest; bal+=sp; yAdd+=sp; }
+            if (timing==="start"){
+                bal+=sp; yAdd+=sp; interest=bal*rPP; bal+=interest; yInt+=interest;
+            } else {
+                interest=bal*rPP; bal+=interest; yInt+=interest; bal+=sp; yAdd+=sp;
+            }
             activePurchases.forEach(function(pu){
                 if (!pu.applied && gPeriod===pu.period) {
                     bal-=pu.amount; yCost+=pu.amount; pu.applied=true;
@@ -977,13 +1024,16 @@ function buildAllLedgers() {
     saveScenarioData();
     var wRows  = computeLedger(scenarioData.working,    null);
     var wEnd   = wRows.length  ? wRows[wRows.length-1].bal   : 0;
-    var b1P    = rawNum(scenarioData.bridge.principal)  > 0 ? rawNum(scenarioData.bridge.principal)  : wEnd;
+    var b1P    = rawNum(scenarioData.bridge.principal)  > 0
+                 ? rawNum(scenarioData.bridge.principal)  : wEnd;
     var b1Rows = computeLedger(scenarioData.bridge,     b1P);
     var b1End  = b1Rows.length ? b1Rows[b1Rows.length-1].bal : 0;
-    var b2P    = rawNum(scenarioData.bridge2.principal) > 0 ? rawNum(scenarioData.bridge2.principal) : b1End;
+    var b2P    = rawNum(scenarioData.bridge2.principal) > 0
+                 ? rawNum(scenarioData.bridge2.principal) : b1End;
     var b2Rows = computeLedger(scenarioData.bridge2,    b2P);
     var b2End  = b2Rows.length ? b2Rows[b2Rows.length-1].bal : 0;
-    var rP     = rawNum(scenarioData.retirement.principal) > 0 ? rawNum(scenarioData.retirement.principal) : b2End;
+    var rP     = rawNum(scenarioData.retirement.principal) > 0
+                 ? rawNum(scenarioData.retirement.principal) : b2End;
     var rRows  = computeLedger(scenarioData.retirement, rP);
     return { working:wRows, bridge:b1Rows, bridge2:b2Rows, retirement:rRows };
 }
@@ -1008,8 +1058,8 @@ function saveScenarioData() {
     d.qpp              = document.getElementById("income-qpp").value;
     d.oas              = document.getElementById("income-oas").value;
     d.pension          = document.getElementById("income-pension").value;
-    d.tfsa_pct         = document.getElementById("tax-tfsa").value;
-    d.rrsp_pct         = document.getElementById("tax-rrsp").value;
+    d.tfsa_bal         = document.getElementById("tax-tfsa").value;
+    d.rrsp_bal         = document.getElementById("tax-rrsp").value;
     d.nrg_gain         = document.getElementById("tax-gain").value;
     d.keeron_split     = document.getElementById("tax-split").value;
     d.withdrawal_order = document.getElementById("tax-order").value;
@@ -1039,14 +1089,16 @@ function loadScenarioData(scenario) {
     document.getElementById("income-qpp").value     = d.qpp    ||"0";
     document.getElementById("income-oas").value     = d.oas    ||"0";
     document.getElementById("income-pension").value = d.pension||"0";
-    document.getElementById("tax-tfsa").value  = d.tfsa_pct||"20";
-    document.getElementById("tax-rrsp").value  = d.rrsp_pct||"45";
+    document.getElementById("tax-tfsa").value  = d.tfsa_bal||"";
+    document.getElementById("tax-rrsp").value  = d.rrsp_bal||"";
     document.getElementById("tax-gain").value  = d.nrg_gain||"87";
     document.getElementById("tax-split").value = d.keeron_split||"50";
     document.getElementById("tax-order").value = d.withdrawal_order||"rrsp_first";
     var taxBtn = document.getElementById("tax-enabled-btn");
-    taxBtn.classList.toggle("active",!!d.taxEnabled); taxBtn.textContent = d.taxEnabled ? "ON" : "OFF";
+    taxBtn.classList.toggle("active",!!d.taxEnabled);
+    taxBtn.textContent = d.taxEnabled ? "ON" : "OFF";
     document.getElementById("tax-card-header").classList.toggle("active",!!d.taxEnabled);
+    updateNrgDisplay();
     updateTaxInputRows();
     /* Load purchases */
     var pus = d.purchases || [];
@@ -1054,7 +1106,8 @@ function loadScenarioData(scenario) {
         var pu = pus[i] || {enabled:false,amount:"",month:"1",year:"1"};
         var n  = i+1;
         var ptBtn = document.getElementById("cost-toggle-"+n);
-        ptBtn.classList.toggle("active",!!pu.enabled); ptBtn.textContent = pu.enabled ? "ON" : "OFF";
+        ptBtn.classList.toggle("active",!!pu.enabled);
+        ptBtn.textContent = pu.enabled ? "ON" : "OFF";
         document.getElementById("cost-amount-"+n).value    = pu.amount||"";
         document.getElementById("cost-amount-"+n).disabled = !pu.enabled;
         document.getElementById("cost-month-"+n).value     = pu.month||"1";
@@ -1062,11 +1115,10 @@ function loadScenarioData(scenario) {
         document.getElementById("cost-when-"+n).classList.toggle("hidden", !pu.enabled);
     }
     hideCostsBody();
-    /* Collapse tax card */
+    /* Collapse tax card on scenario switch */
     taxCardOpen = false;
     document.getElementById("tax-profile-body").classList.add("hidden");
     document.getElementById("tax-card-chevron").classList.remove("open");
-    /* Update income card visibility */
     updateIncomeCardVisibility();
 }
 function updateTopTabTint() {
@@ -1076,7 +1128,9 @@ function updateTopTabTint() {
     document.querySelector(".defaults-tab").style.background = t.defaults;
 }
 function updateScenarioTabs() {
-    document.querySelectorAll(".scenario-btn").forEach(function(b){ b.classList.remove("active"); });
+    document.querySelectorAll(".scenario-btn").forEach(function(b){
+        b.classList.remove("active");
+    });
     document.querySelector('[data-scenario="'+activeScenario+'"]').classList.add("active");
 }
 function switchScenario(newScenario) {
@@ -1085,8 +1139,18 @@ function switchScenario(newScenario) {
     var prev = activeScenario;
     activeScenario = newScenario;
     if (SCENARIO_ORDER[newScenario] > SCENARIO_ORDER[prev]) {
+        /* Carry forward portfolio ending balance */
         var bal = calcEndingBalance(scenarioData[prev]);
-        scenarioData[newScenario].principal = bal.toLocaleString("en-CA",{maximumFractionDigits:2});
+        scenarioData[newScenario].principal =
+            bal.toLocaleString("en-CA",{maximumFractionDigits:2});
+        /* Carry forward depleted account balances if tax was modelled */
+        var prevTx = computeTaxEstimate(scenarioData[prev]);
+        if (prevTx) {
+            scenarioData[newScenario].rrsp_bal =
+                Math.round(prevTx.end_rrsp).toLocaleString("en-CA");
+            scenarioData[newScenario].tfsa_bal =
+                Math.round(prevTx.end_tfsa).toLocaleString("en-CA");
+        }
     }
     loadScenarioData(newScenario);
     updateScenarioTabs();
@@ -1098,10 +1162,16 @@ function switchScenario(newScenario) {
    TOP TAB SWITCHING
 ───────────────────────────────────────────── */
 function switchTopTab(name) {
-    document.querySelectorAll(".tab-content").forEach(function(p){ p.classList.add("hidden"); });
+    document.querySelectorAll(".tab-content").forEach(function(p){
+        p.classList.add("hidden");
+    });
     document.getElementById("panel-"+name).classList.remove("hidden");
-    document.querySelectorAll(".tab-btn").forEach(function(b){ b.classList.remove("active"); });
-    var cls = name==="calculator" ? ".calc-tab" : name==="ledger" ? ".ledger-tab" : ".defaults-tab";
+    document.querySelectorAll(".tab-btn").forEach(function(b){
+        b.classList.remove("active");
+    });
+    var cls = name==="calculator" ? ".calc-tab"
+            : name==="ledger"     ? ".ledger-tab"
+            : ".defaults-tab";
     document.querySelector(cls).classList.add("active");
     if (name==="defaults") loadDefaultsIntoPanel();
 }
@@ -1111,7 +1181,8 @@ function switchTopTab(name) {
 function defaultsKey(scenario){ return (scenario||activeScenario)+"_defaults"; }
 function loadDefaultsIntoPanel() {
     var d = JSON.parse(localStorage.getItem(defaultsKey())) || FALLBACKS[activeScenario];
-    document.getElementById("defaults-header-label").textContent = SCENARIO_LABELS[activeScenario]+" — Defaults";
+    document.getElementById("defaults-header-label").textContent =
+        SCENARIO_LABELS[activeScenario]+" — Defaults";
     document.getElementById("def-principal").value  = d.principal!==undefined ? d.principal : "";
     document.getElementById("def-rate").value       = d.rate;
     document.getElementById("def-inflation").value  = d.inflation||"3.00";
@@ -1160,6 +1231,7 @@ function resetCalculator(){ applyDefaults(true); }
    CALCULATE
 ───────────────────────────────────────────── */
 function calculate() {
+    updateNrgDisplay();
     var P        = getField("principal");
     var r        = (parseFloat(document.getElementById("rate").value)||0)/100;
     var inflation= (parseFloat(document.getElementById("inflation").value)||0)/100;
@@ -1177,7 +1249,8 @@ function calculate() {
             var cMon = parseInt(document.getElementById("cost-month-"+ci).value)||1;
             var cYr  = parseInt(document.getElementById("cost-year-"+ci).value)||1;
             if (cAmt > 0) calcPurchases.push({
-                amount:cAmt, period:(cYr-1)*n+Math.floor((cMon-1)*n/12),
+                amount:cAmt,
+                period:(cYr-1)*n+Math.floor((cMon-1)*n/12),
                 applied:false, month:cMon, year:cYr
             });
         }
@@ -1197,12 +1270,16 @@ function calculate() {
         for (var p=0; p<n; p++) {
             var sp = scaledPmt(pmtPP,inflPP,gPeriod)+incPP;
             var interest;
-            if (timing==="start"){ bal+=sp; yAdd+=sp; interest=bal*rPP; bal+=interest; yInt+=interest; }
-            else { interest=bal*rPP; bal+=interest; yInt+=interest; bal+=sp; yAdd+=sp; }
+            if (timing==="start"){
+                bal+=sp; yAdd+=sp; interest=bal*rPP; bal+=interest; yInt+=interest;
+            } else {
+                interest=bal*rPP; bal+=interest; yInt+=interest; bal+=sp; yAdd+=sp;
+            }
             calcPurchases.forEach(function(pu){
                 if (!pu.applied && gPeriod===pu.period) {
                     bal-=pu.amount; yCost+=pu.amount; pu.applied=true;
-                    yearCostNotes.push('⬇ Cost: −'+fmt(pu.amount)+' ('+MONTHS[pu.month-1]+', Yr '+pu.year+')');
+                    yearCostNotes.push('⬇ Cost: −'+fmt(pu.amount)+
+                        ' ('+MONTHS[pu.month-1]+', Yr '+pu.year+')');
                 }
             });
             gPeriod++;
@@ -1217,25 +1294,32 @@ function calculate() {
             '<td class="center-col">'+fmt(yInt)+'</td>'+
             '<td class="right-col ending">'+fmt(bal)+'</td></tr>';
         if (inflation > 0)
-            html += '<tr class="row-real"><td></td><td></td><td>[real: '+fmt(yReal)+']</td></tr>';
+            html += '<tr class="row-real"><td></td><td></td>'+
+                    '<td>[real: '+fmt(yReal)+']</td></tr>';
         yearCostNotes.forEach(function(note){
             html += '<tr class="row-cost"><td></td><td colspan="2">'+note+'</td></tr>';
         });
     }
-    var endingReal  = realValue(bal, inflation, t);
-    var inflPct     = (parseFloat(document.getElementById("inflation").value)||0).toFixed(2);
-    var adjSuffix   = inflAdj ? " • CPI ADJ" : "";
-    var incomeSuffix= totalMonthlyIncome>0 ? " • $"+Math.round(totalMonthlyIncome).toLocaleString()+"/mo income" : "";
-    document.getElementById("res-additions-label").textContent = addSign===-1 ? "Total Net Draw on Savings" : "Total Additions / Subtractions";
+    var endingReal   = realValue(bal, inflation, t);
+    var inflPct      = (parseFloat(document.getElementById("inflation").value)||0).toFixed(2);
+    var adjSuffix    = inflAdj ? " • CPI ADJ" : "";
+    var incomeSuffix = totalMonthlyIncome > 0
+        ? " • $"+Math.round(totalMonthlyIncome).toLocaleString()+"/mo income" : "";
+    document.getElementById("res-additions-label").textContent =
+        addSign===-1 ? "Total Net Draw on Savings" : "Total Additions / Subtractions";
     document.getElementById("res-additions").textContent = fmt(totAdd);
     document.getElementById("res-interest").textContent  = fmt(totInt);
     document.getElementById("res-ending").textContent    = fmt(bal);
     document.getElementById("res-real").textContent      = fmt(endingReal);
-    document.getElementById("res-real-label").textContent= "Real Value (today's $) @ "+inflPct+"% inflation";
-    document.getElementById("ledger-title").textContent  = t+" YEARS"+adjSuffix+incomeSuffix;
+    document.getElementById("res-real-label").textContent =
+        "Real Value (today's $) @ "+inflPct+"% inflation";
+    document.getElementById("ledger-title").textContent  =
+        t+" YEARS"+adjSuffix+incomeSuffix;
     document.getElementById("ledger-body").innerHTML     = html;
     document.getElementById("ledger-foot").innerHTML     =
-        '<tr><td>Total</td><td class="center-col">'+fmt(totAdd+totInt)+'</td><td class="right-col">'+fmt(bal)+'</td></tr>';
+        '<tr><td>Total</td><td class="center-col">'+fmt(totAdd+totInt)+
+        '</td><td class="right-col">'+fmt(bal)+'</td></tr>';
+    /* Income offset rows */
     var incRow = document.getElementById("res-income-row");
     var netRow = document.getElementById("res-net-draw-row");
     if (totalMonthlyIncome>0 && addSign===-1) {
@@ -1252,7 +1336,8 @@ function calculate() {
         incRow.classList.add("hidden");
         netRow.classList.add("hidden");
     }
-    var totalCosts     = calcPurchases.reduce(function(s,pu){ return s+pu.amount; }, 0);
+    /* One-time cost row */
+    var totalCosts      = calcPurchases.reduce(function(s,pu){ return s+pu.amount; }, 0);
     var activeCostCount = calcPurchases.length;
     var prRow = document.getElementById("res-purchase-row");
     if (totalCosts > 0) {
@@ -1263,26 +1348,30 @@ function calculate() {
     } else {
         prRow.classList.add("hidden");
     }
+    /* Save before tax estimate so computeTaxEstimate reads current values */
     saveScenarioData();
+    /* Tax estimate block */
     var tx = computeTaxEstimate(scenarioData[activeScenario]);
-  var taxRows = ["res-tax-divider","res-tax-withdrawal-row","res-tax-owing-row",
-               "res-tax-aftertax-row","res-tax-rate-row","res-tax-keeron-row","res-tax-erin-row"];
-if (tx) {
-    taxRows.forEach(function(id){ document.getElementById(id).classList.remove("hidden"); });
-    var grossMo    = rawNum(document.getElementById("addition").value);
-    var afterTaxMo = grossMo - tx.monthly_tax;
-    document.getElementById("res-tax-withdrawal").textContent = fmt(grossMo)+'/mo';
-    document.getElementById("res-tax-owing").textContent      = '−'+fmt(tx.monthly_tax)+'/mo';
-    document.getElementById("res-tax-aftertax").textContent   = fmt(afterTaxMo)+'/mo';
-    document.getElementById("res-tax-rate").textContent       = pct(tx.eff_rate*100);
-    document.getElementById("res-tax-keeron").textContent     = fmt(tx.k_taxable)+' / '+fmt(tx.k_tax);
-    document.getElementById("res-tax-erin").textContent       = fmt(tx.e_taxable)+' / '+fmt(tx.e_tax);
-    document.getElementById("tax-card-header").classList.add("active");
-} else {
-    taxRows.forEach(function(id){ document.getElementById(id).classList.add("hidden"); });
-    document.getElementById("tax-card-header").classList.toggle("active",!!scenarioData[activeScenario].taxEnabled);
-}
-
+    var taxRows = ["res-tax-divider","res-tax-withdrawal-row","res-tax-owing-row",
+                   "res-tax-aftertax-row","res-tax-rate-row",
+                   "res-tax-keeron-row","res-tax-erin-row"];
+    if (tx) {
+        taxRows.forEach(function(id){ document.getElementById(id).classList.remove("hidden"); });
+        var afterTaxMo = grossMonthly - tx.monthly_tax;
+        document.getElementById("res-tax-withdrawal").textContent = fmt(grossMonthly)+"/mo";
+        document.getElementById("res-tax-owing").textContent      = "−"+fmt(tx.monthly_tax)+"/mo";
+        document.getElementById("res-tax-aftertax").textContent   = fmt(afterTaxMo)+"/mo";
+        document.getElementById("res-tax-rate").textContent       = pct(tx.eff_rate*100);
+        document.getElementById("res-tax-keeron").textContent     =
+            fmt(tx.k_taxable)+"/yr  ·  "+fmt(tx.k_tax)+" tax";
+        document.getElementById("res-tax-erin").textContent       =
+            fmt(tx.e_taxable)+"/yr  ·  "+fmt(tx.e_tax)+" tax";
+        document.getElementById("tax-card-header").classList.add("active");
+    } else {
+        taxRows.forEach(function(id){ document.getElementById(id).classList.add("hidden"); });
+        document.getElementById("tax-card-header").classList.toggle(
+            "active", !!scenarioData[activeScenario].taxEnabled);
+    }
 }
 /* ─────────────────────────────────────────────
    CHART MODAL
@@ -1320,20 +1409,32 @@ function renderModalChart(scenario) {
     canvas.height = wrap.clientHeight-14;
     _modalChart = new Chart(canvas.getContext("2d"), {
         type:"line",
-        data:{ labels:data.map(function(r){ return "Yr "+r.year; }),
-               datasets:[
-                   { label:"Balance",    data:data.map(function(r){ return r.bal; }),
-                     borderColor:colors.nominal, backgroundColor:colors.nominal+"28",
-                     fill:true, tension:0.4, pointRadius:data.length>25?1:3, borderWidth:2 },
-                   { label:"Real Value", data:data.map(function(r){ return r.yReal; }),
-                     borderColor:colors.real, backgroundColor:"transparent",
-                     fill:false, tension:0.4, borderDash:[6,3], pointRadius:data.length>25?1:3, borderWidth:2 }
-               ]},
-        options:{ responsive:false, animation:false,
-            plugins:{ legend:{position:"top",labels:{font:{size:11},usePointStyle:true,boxWidth:10}},
-                      tooltip:{callbacks:{label:function(ctx){ return ctx.dataset.label+": "+fmt(ctx.raw); }}}},
-            scales:{ y:{ticks:{callback:fmtShort,font:{size:10}},grid:{color:"#e8e8ec"}},
-                     x:{ticks:{font:{size:10},maxTicksLimit:12},grid:{display:false}} }}
+        data:{
+            labels:data.map(function(r){ return "Yr "+r.year; }),
+            datasets:[
+                { label:"Balance",
+                  data:data.map(function(r){ return r.bal; }),
+                  borderColor:colors.nominal, backgroundColor:colors.nominal+"28",
+                  fill:true, tension:0.4,
+                  pointRadius:data.length>25?1:3, borderWidth:2 },
+                { label:"Real Value",
+                  data:data.map(function(r){ return r.yReal; }),
+                  borderColor:colors.real, backgroundColor:"transparent",
+                  fill:false, tension:0.4, borderDash:[6,3],
+                  pointRadius:data.length>25?1:3, borderWidth:2 }
+            ]},
+        options:{
+            responsive:false, animation:false,
+            plugins:{
+                legend:{position:"top",labels:{font:{size:11},usePointStyle:true,boxWidth:10}},
+                tooltip:{callbacks:{label:function(ctx){
+                    return ctx.dataset.label+": "+fmt(ctx.raw);
+                }}}
+            },
+            scales:{
+                y:{ticks:{callback:fmtShort,font:{size:10}},grid:{color:"#e8e8ec"}},
+                x:{ticks:{font:{size:10},maxTicksLimit:12},grid:{display:false}}
+            }}
     });
 }
 /* ─────────────────────────────────────────────
@@ -1352,29 +1453,40 @@ function renderChartToDataURL(data, scenario) {
     document.body.appendChild(canvas);
     var tmp = new Chart(canvas.getContext("2d"), {
         type:"line",
-        data:{ labels:data.map(function(r){ return "Yr "+r.year; }),
-               datasets:[
-                   { label:"Balance",    data:data.map(function(r){ return r.bal; }),
-                     borderColor:colors.nominal, backgroundColor:colors.nominal+"28",
-                     fill:true, tension:0.4, pointRadius:data.length>25?1:3, borderWidth:2 },
-                   { label:"Real Value", data:data.map(function(r){ return r.yReal; }),
-                     borderColor:colors.real, backgroundColor:"transparent",
-                     fill:false, tension:0.4, borderDash:[6,3], pointRadius:data.length>25?1:3, borderWidth:2 }
-               ]},
-        options:{ responsive:false, animation:false,
-            plugins:{ legend:{position:"top",labels:{font:{size:12},usePointStyle:true}} },
-            scales:{ y:{ticks:{callback:fmtShort,font:{size:11}}},
-                     x:{ticks:{font:{size:11},maxTicksLimit:12},grid:{display:false}} }}
+        data:{
+            labels:data.map(function(r){ return "Yr "+r.year; }),
+            datasets:[
+                { label:"Balance",
+                  data:data.map(function(r){ return r.bal; }),
+                  borderColor:colors.nominal, backgroundColor:colors.nominal+"28",
+                  fill:true, tension:0.4,
+                  pointRadius:data.length>25?1:3, borderWidth:2 },
+                { label:"Real Value",
+                  data:data.map(function(r){ return r.yReal; }),
+                  borderColor:colors.real, backgroundColor:"transparent",
+                  fill:false, tension:0.4, borderDash:[6,3],
+                  pointRadius:data.length>25?1:3, borderWidth:2 }
+            ]},
+        options:{
+            responsive:false, animation:false,
+            plugins:{legend:{position:"top",labels:{font:{size:12},usePointStyle:true}}},
+            scales:{
+                y:{ticks:{callback:fmtShort,font:{size:11}}},
+                x:{ticks:{font:{size:11},maxTicksLimit:12},grid:{display:false}}
+            }}
     });
     var url = canvas.toDataURL("image/png");
     tmp.destroy(); document.body.removeChild(canvas);
     return url;
 }
 function buildPrintHTML(allData, images) {
-    var date = new Date().toLocaleDateString("en-CA",{year:"numeric",month:"long",day:"numeric"});
+    var date = new Date().toLocaleDateString("en-CA",
+        {year:"numeric",month:"long",day:"numeric"});
     var html = '<div class="print-doc">';
-    html += '<div class="print-cover"><h1>Retirement Projection — Keeron &amp; Erin</h1>'+
-            '<p>Generated '+date+(inflAdj?" &nbsp;·&nbsp; CPI-Adjusted Withdrawals":"")+'</p></div>';
+    html += '<div class="print-cover">'+
+            '<h1>Retirement Projection — Keeron &amp; Erin</h1>'+
+            '<p>Generated '+date+(inflAdj?" &nbsp;·&nbsp; CPI-Adjusted Withdrawals":"")+'</p>'+
+            '</div>';
     SCENARIOS.forEach(function(s, idx) {
         var d    = scenarioData[s];
         var rows = allData[s];
@@ -1386,51 +1498,90 @@ function buildPrintHTML(allData, images) {
         var totalInc = rawNum(d.qpp)+rawNum(d.oas)+rawNum(d.pension);
         var netMo    = isWdr ? Math.max(0, rawNum(d.addition)-totalInc) : 0;
         var tx = computeTaxEstimate(d);
-        var activePus = (d.purchases||[]).filter(function(p){ return p.enabled && rawNum(p.amount)>0; });
+        var activePus = (d.purchases||[]).filter(function(p){
+            return p.enabled && rawNum(p.amount)>0;
+        });
         html += '<div class="print-scenario'+(idx<SCENARIOS.length-1?' print-break':'')+'">';
-        html += '<div class="print-scenario-header" style="background:'+PRINT_HDR_COLORS[s]+'">'+SCENARIO_LABELS[s]+'</div>';
+        html += '<div class="print-scenario-header" style="background:'+
+                PRINT_HDR_COLORS[s]+'">'+SCENARIO_LABELS[s]+'</div>';
         html += '<table class="print-summary-table"><tbody>';
-        html += '<tr><td>Starting Balance</td><td>'+fmt(first.opening)+'</td><td>Interest Rate</td><td>'+d.rate+'%</td></tr>';
-        html += '<tr><td>Duration</td><td>'+d.duration+' years</td><td>Inflation Rate</td><td>'+d.inflation+'%</td></tr>';
-        html += '<tr><td>Gross Monthly '+(isWdr?"Withdrawal":"Contribution")+'</td><td>'+fmt(rawNum(d.addition))+'</td><td>CPI-Adjusted</td><td>'+(inflAdj&&isWdr?"Yes ✓":"No")+'</td></tr>';
+        html += '<tr><td>Starting Balance</td><td>'+fmt(first.opening)+
+                '</td><td>Interest Rate</td><td>'+d.rate+'%</td></tr>';
+        html += '<tr><td>Duration</td><td>'+d.duration+
+                ' years</td><td>Inflation Rate</td><td>'+d.inflation+'%</td></tr>';
+        html += '<tr><td>Gross Monthly '+(isWdr?"Withdrawal":"Contribution")+'</td>'+
+                '<td>'+fmt(rawNum(d.addition))+'</td>'+
+                '<td>CPI-Adjusted</td><td>'+(inflAdj&&isWdr?"Yes ✓":"No")+'</td></tr>';
+        if (rawNum(d.tfsa_bal)>0 || rawNum(d.rrsp_bal)>0) {
+            var nrg = Math.max(0, rawNum(d.principal)-rawNum(d.tfsa_bal)-rawNum(d.rrsp_bal));
+            html += '<tr><td>TFSA Balance</td><td>'+fmt(rawNum(d.tfsa_bal))+
+                    '</td><td>RRSP Balance</td><td>'+fmt(rawNum(d.rrsp_bal))+'</td></tr>';
+            html += '<tr><td>Non-Reg Balance</td><td>'+fmt(nrg)+
+                    '</td><td>Draw Order</td><td>'+(d.withdrawal_order||"rrsp_first")+'</td></tr>';
+        }
         if (totalInc > 0) {
             var parts=[];
             if (rawNum(d.qpp)>0)    parts.push("QPP "+fmt(rawNum(d.qpp)));
             if (rawNum(d.oas)>0)    parts.push("OAS "+fmt(rawNum(d.oas)));
             if (rawNum(d.pension)>0)parts.push("Pension "+fmt(rawNum(d.pension)));
-            html += '<tr><td>Monthly Income</td><td style="color:#2b6cb0;font-weight:600">+'+fmt(totalInc)+'/mo</td><td>Net Monthly Draw</td><td>'+fmt(netMo)+'/mo</td></tr>';
-            html += '<tr><td colspan="4" style="color:#4299e1;font-size:10px;font-style:italic;background:#f0f8ff">'+parts.join(" + ")+'</td></tr>';
+            html += '<tr><td>Monthly Income</td>'+
+                    '<td style="color:#2b6cb0;font-weight:600">+'+fmt(totalInc)+'/mo</td>'+
+                    '<td>Net Monthly Draw</td><td>'+fmt(netMo)+'/mo</td></tr>';
+            html += '<tr><td colspan="4" style="color:#4299e1;font-size:10px;font-style:italic;'+
+                    'background:#f0f8ff">'+parts.join(" + ")+'</td></tr>';
         }
         if (activePus.length > 0) {
-            var puDesc = activePus.map(function(pu){ return fmt(rawNum(pu.amount))+" ("+MONTHS[parseInt(pu.month)-1]+", Yr "+pu.year+")"; }).join(" · ");
-            html += '<tr><td>One-Time Costs ('+activePus.length+')</td><td colspan="3" style="color:#c0392b">'+puDesc+'</td></tr>';
+            var puDesc = activePus.map(function(pu){
+                return fmt(rawNum(pu.amount))+" ("+MONTHS[parseInt(pu.month)-1]+", Yr "+pu.year+")";
+            }).join(" · ");
+            html += '<tr><td>One-Time Costs ('+activePus.length+')</td>'+
+                    '<td colspan="3" style="color:#c0392b">'+puDesc+'</td></tr>';
         }
         if (tx) {
-            html += '<tr><td>Est. Annual Tax</td><td style="color:#c05621;font-weight:600">'+fmt(tx.total_tax)+'</td><td>Eff. Tax Rate</td><td style="color:#c05621">'+pct(tx.eff_rate*100)+'</td></tr>';
-            html += '<tr><td>Keeron Taxable</td><td>'+fmt(tx.k_taxable)+'/yr</td><td>Erin Taxable</td><td>'+fmt(tx.e_taxable)+'/yr</td></tr>';
-            html += '<tr><td>Gross Draw Needed</td><td style="color:#c0392b;font-weight:600">'+fmt(tx.gross_needed)+'/mo</td><td>Monthly Tax Reserve</td><td>'+fmt(tx.monthly_tax)+'/mo</td></tr>';
+            var grossMoPr  = rawNum(d.addition);
+            var afterTaxPr = grossMoPr - tx.monthly_tax;
+            html += '<tr><td>Monthly Withdrawal</td><td>'+fmt(grossMoPr)+'/mo</td>'+
+                    '<td>Est. Tax / mo</td>'+
+                    '<td style="color:#c05621">'+fmt(tx.monthly_tax)+'/mo</td></tr>';
+            html += '<tr><td>After-Tax Monthly</td>'+
+                    '<td style="color:#276749;font-weight:600">'+fmt(afterTaxPr)+'/mo</td>'+
+                    '<td>Eff. Tax Rate</td>'+
+                    '<td style="color:#c05621">'+pct(tx.eff_rate*100)+'</td></tr>';
+            html += '<tr><td>Keeron Taxable / Tax</td>'+
+                    '<td>'+fmt(tx.k_taxable)+' / '+fmt(tx.k_tax)+'</td>'+
+                    '<td>Erin Taxable / Tax</td>'+
+                    '<td>'+fmt(tx.e_taxable)+' / '+fmt(tx.e_tax)+'</td></tr>';
         }
-        html += '<tr><td>Total Net Draw</td><td>'+fmt(totAdd)+'</td><td>Total Interest</td><td>'+fmt(totInt)+'</td></tr>';
-        html += '<tr><td><strong>Ending Balance</strong></td><td><strong>'+fmt(last.bal)+'</strong></td><td>Real Value</td><td>'+fmt(last.yReal)+'</td></tr>';
+        html += '<tr><td>Total Net Draw</td><td>'+fmt(totAdd)+
+                '</td><td>Total Interest</td><td>'+fmt(totInt)+'</td></tr>';
+        html += '<tr><td><strong>Ending Balance</strong></td>'+
+                '<td><strong>'+fmt(last.bal)+'</strong></td>'+
+                '<td>Real Value</td><td>'+fmt(last.yReal)+'</td></tr>';
         html += '</tbody></table>';
-        if (images[s]) html += '<img class="print-chart-img" src="'+images[s]+'" alt="'+SCENARIO_LABELS[s]+'">';
+        if (images[s])
+            html += '<img class="print-chart-img" src="'+images[s]+
+                    '" alt="'+SCENARIO_LABELS[s]+'">';
         html += '<table class="print-ledger-table"><thead><tr>'+
-                '<th>Year</th><th>Beg. Balance</th><th>'+(isWdr?"Net Draw":"Additions")+'</th>'+
-                '<th>Interest</th><th>End. Balance</th><th>Real Value</th></tr></thead><tbody>';
+                '<th>Year</th><th>Beg. Balance</th>'+
+                '<th>'+(isWdr?"Net Draw":"Additions")+'</th>'+
+                '<th>Interest</th><th>End. Balance</th><th>Real Value</th>'+
+                '</tr></thead><tbody>';
         rows.forEach(function(row){
-            html += '<tr><td>'+row.year+'</td><td>'+fmt(row.opening)+'</td><td>'+fmt(row.yAdd)+'</td>'+
-                    '<td>'+fmt(row.yInt)+'</td><td class="end-bal">'+fmt(row.bal)+'</td>'+
+            html += '<tr><td>'+row.year+'</td><td>'+fmt(row.opening)+'</td>'+
+                    '<td>'+fmt(row.yAdd)+'</td><td>'+fmt(row.yInt)+'</td>'+
+                    '<td class="end-bal">'+fmt(row.bal)+'</td>'+
                     '<td class="real-val">'+fmt(row.yReal)+'</td></tr>';
             if (row.costs && row.costs.length) {
                 row.costs.forEach(function(c){
                     html += '<tr style="color:#c0392b;font-style:italic">'+
-                            '<td colspan="6" style="padding:2px 8px 4px">⬇ Cost: −'+fmt(c.amount)+
-                            ' ('+MONTHS[c.month-1]+', Yr '+c.year+')</td></tr>';
+                            '<td colspan="6" style="padding:2px 8px 4px">⬇ Cost: −'+
+                            fmt(c.amount)+' ('+MONTHS[c.month-1]+', Yr '+c.year+')</td></tr>';
                 });
             }
         });
-        html += '</tbody><tfoot><tr><td>Total</td><td>—</td><td>'+fmt(totAdd)+'</td><td>'+fmt(totInt)+
-                '</td><td>'+fmt(last.bal)+'</td><td>'+fmt(last.yReal)+'</td></tr></tfoot></table></div>';
+        html += '</tbody><tfoot><tr><td>Total</td><td>—</td><td>'+fmt(totAdd)+'</td>'+
+                '<td>'+fmt(totInt)+'</td><td>'+fmt(last.bal)+'</td>'+
+                '<td>'+fmt(last.yReal)+'</td></tr></tfoot></table></div>';
     });
     html += '</div>';
     return html;
@@ -1464,7 +1615,7 @@ function formatField(id) {
    INIT
 ───────────────────────────────────────────── */
 document.addEventListener("DOMContentLoaded", function(){
-    /* Inject costs card into placeholder */
+    /* Inject costs card */
     var ph = document.getElementById("costs-card-placeholder");
     ph.outerHTML = buildCostCard();
     /* Load + migrate scenario data from localStorage */
@@ -1473,10 +1624,17 @@ document.addEventListener("DOMContentLoaded", function(){
         if (raw) { try {
             var p = JSON.parse(raw);
             delete p.visited; delete p.inflAdj;
+            /* Migrate old % fields — can't convert, reset to blank */
+            if (p.tfsa_pct !== undefined && p.tfsa_bal === undefined) {
+                delete p.tfsa_pct; delete p.rrsp_pct;
+            }
             /* Migrate old single-purchase format */
             if (p.purchaseEnabled !== undefined && !p.purchases) {
                 p.purchases = [
-                    {enabled:p.purchaseEnabled||false, amount:p.purchaseAmount||"", month:p.purchaseMonth||"1", year:p.purchaseYear||"1"},
+                    {enabled:p.purchaseEnabled||false,
+                     amount:p.purchaseAmount||"",
+                     month:p.purchaseMonth||"1",
+                     year:p.purchaseYear||"1"},
                     {enabled:false,amount:"",month:"1",year:"1"},
                     {enabled:false,amount:"",month:"1",year:"1"},
                     {enabled:false,amount:"",month:"1",year:"1"},
@@ -1507,34 +1665,50 @@ document.addEventListener("DOMContentLoaded", function(){
     /* Input focus clear behaviour */
     document.querySelectorAll("input").forEach(function(input){
         var saved="", cleared=false;
-        input.addEventListener("focus",   function(){ saved=input.value; cleared=false; input.style.color="#c0c0c8"; });
-        input.addEventListener("keydown", function(){ if(!cleared){ cleared=true; input.value=""; input.style.color="#1c1c1e"; }});
-        input.addEventListener("blur",    function(){ input.style.color="#1c1c1e"; if(input.value.trim()==="") input.value=saved; });
+        input.addEventListener("focus",   function(){
+            saved=input.value; cleared=false; input.style.color="#c0c0c8";
+        });
+        input.addEventListener("keydown", function(){
+            if(!cleared){ cleared=true; input.value=""; input.style.color="#1c1c1e"; }
+        });
+        input.addEventListener("blur",    function(){
+            input.style.color="#1c1c1e";
+            if(input.value.trim()==="") input.value=saved;
+        });
     });
     /* Calculator listeners */
     document.getElementById("principal").addEventListener("input",  calculate);
-    document.getElementById("principal").addEventListener("blur",   function(){ formatField("principal"); });
+    document.getElementById("principal").addEventListener("blur",
+        function(){ formatField("principal"); updateNrgDisplay(); });
     document.getElementById("addition").addEventListener("input",   calculate);
-    document.getElementById("addition").addEventListener("blur",    function(){ formatField("addition"); });
-    document.getElementById("rate").addEventListener("blur",        function(){ var v=parseFloat(this.value); this.value=isNaN(v)?"0.00":v.toFixed(2); calculate(); });
-    document.getElementById("inflation").addEventListener("blur",   function(){ var v=parseFloat(this.value); this.value=isNaN(v)?"0.00":v.toFixed(2); calculate(); });
+    document.getElementById("addition").addEventListener("blur",
+        function(){ formatField("addition"); });
+    document.getElementById("rate").addEventListener("blur", function(){
+        var v=parseFloat(this.value); this.value=isNaN(v)?"0.00":v.toFixed(2); calculate();
+    });
+    document.getElementById("inflation").addEventListener("blur", function(){
+        var v=parseFloat(this.value); this.value=isNaN(v)?"0.00":v.toFixed(2); calculate();
+    });
     document.getElementById("compound").addEventListener("change",  calculate);
-    document.getElementById("duration").addEventListener("input",   function(){ updateAllCostYearOptions(); calculate(); });
+    document.getElementById("duration").addEventListener("input",
+        function(){ updateAllCostYearOptions(); calculate(); });
     document.getElementById("addFreq").addEventListener("change",   calculate);
     document.getElementById("addTiming").addEventListener("change", calculate);
     /* Income listeners */
     ["income-qpp","income-oas","income-pension"].forEach(function(id){
         document.getElementById(id).addEventListener("input", calculate);
-        document.getElementById(id).addEventListener("blur",  function(){ formatField(id); });
+        document.getElementById(id).addEventListener("blur",
+            function(){ formatField(id); });
     });
     /* Cost listeners */
     for (var ci = 1; ci <= 5; ci++) {
         (function(n){
             document.getElementById("cost-amount-"+n).addEventListener("input", calculate);
-            document.getElementById("cost-amount-"+n).addEventListener("blur",  function(){
+            document.getElementById("cost-amount-"+n).addEventListener("blur", function(){
                 var el  = document.getElementById("cost-amount-"+n);
                 var num = rawNum(el.value);
-                el.value = num > 0 ? num.toLocaleString("en-CA",{maximumFractionDigits:2}) : "";
+                el.value = num > 0
+                    ? num.toLocaleString("en-CA",{maximumFractionDigits:2}) : "";
                 calculate();
             });
             document.getElementById("cost-month-"+n).addEventListener("change", calculate);
@@ -1543,16 +1717,31 @@ document.addEventListener("DOMContentLoaded", function(){
     }
     /* Tax listeners */
     ["tax-tfsa","tax-rrsp"].forEach(function(id){
-        document.getElementById(id).addEventListener("input", function(){ updateNrgDisplay(); calculate(); });
+        document.getElementById(id).addEventListener("input", function(){
+            updateNrgDisplay(); calculate();
+        });
+        document.getElementById(id).addEventListener("blur", function(){
+            var el  = document.getElementById(id);
+            var num = rawNum(el.value);
+            el.value = num > 0
+                ? num.toLocaleString("en-CA",{maximumFractionDigits:0}) : "";
+            updateNrgDisplay(); calculate();
+        });
     });
     document.getElementById("tax-gain").addEventListener("input",   calculate);
     document.getElementById("tax-split").addEventListener("input",  calculate);
     document.getElementById("tax-order").addEventListener("change", calculate);
     /* Defaults listeners */
-    document.getElementById("def-principal").addEventListener("blur", function(){ formatField("def-principal"); });
-    document.getElementById("def-addition").addEventListener("blur",  function(){ formatField("def-addition"); });
-    document.getElementById("def-rate").addEventListener("blur",      function(){ var v=parseFloat(this.value); this.value=isNaN(v)?"0.00":v.toFixed(2); });
-    document.getElementById("def-inflation").addEventListener("blur", function(){ var v=parseFloat(this.value); this.value=isNaN(v)?"0.00":v.toFixed(2); });
+    document.getElementById("def-principal").addEventListener("blur",
+        function(){ formatField("def-principal"); });
+    document.getElementById("def-addition").addEventListener("blur",
+        function(){ formatField("def-addition"); });
+    document.getElementById("def-rate").addEventListener("blur", function(){
+        var v=parseFloat(this.value); this.value=isNaN(v)?"0.00":v.toFixed(2);
+    });
+    document.getElementById("def-inflation").addEventListener("blur", function(){
+        var v=parseFloat(this.value); this.value=isNaN(v)?"0.00":v.toFixed(2);
+    });
 });
 </script>
 </body>
