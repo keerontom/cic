@@ -967,36 +967,37 @@ function computeTaxEstimate(d) {
         var draw_k_nrg  = 0;
         var rem = netAnnualDraw;
         if (order === "rrsp_first") {
-            /* Drain RRSP pool first, split by each person's share */
+            /* Correct order: RRSP → Non-Reg → TFSA (tax-free last) */
             var from_rrsp = Math.min(rem, total_rrsp);
             if (total_rrsp > 0) {
                 draw_k_rrsp = from_rrsp * (cur_k_rrsp / total_rrsp);
                 draw_e_rrsp = from_rrsp * (cur_e_rrsp / total_rrsp);
             }
             rem -= from_rrsp;
-            /* Then TFSA pool */
+            /* Non-Reg next (Keeron only — partially taxable) */
+            draw_k_nrg = Math.min(rem, cur_k_nrg);
+            rem -= draw_k_nrg;
+            /* TFSA last (completely tax-free — preserve longest) */
             var from_tfsa = Math.min(rem, total_tfsa);
             if (total_tfsa > 0) {
                 draw_k_tfsa = from_tfsa * (cur_k_tfsa / total_tfsa);
                 draw_e_tfsa = from_tfsa * (cur_e_tfsa / total_tfsa);
             }
-            rem -= from_tfsa;
-            /* Finally NRG (Keeron only) */
-            draw_k_nrg = Math.min(rem, cur_k_nrg);
         } else if (order === "tfsa_first") {
+            /* Correct order: TFSA → Non-Reg → RRSP */
             var from_tfsa2 = Math.min(rem, total_tfsa);
             if (total_tfsa > 0) {
                 draw_k_tfsa = from_tfsa2 * (cur_k_tfsa / total_tfsa);
                 draw_e_tfsa = from_tfsa2 * (cur_e_tfsa / total_tfsa);
             }
             rem -= from_tfsa2;
+            draw_k_nrg = Math.min(rem, cur_k_nrg);
+            rem -= draw_k_nrg;
             var from_rrsp2 = Math.min(rem, total_rrsp);
             if (total_rrsp > 0) {
                 draw_k_rrsp = from_rrsp2 * (cur_k_rrsp / total_rrsp);
                 draw_e_rrsp = from_rrsp2 * (cur_e_rrsp / total_rrsp);
             }
-            rem -= from_rrsp2;
-            draw_k_nrg = Math.min(rem, cur_k_nrg);
         } else {
             /* Proportional — draw from all accounts by relative weight */
             var total_all = (total_rrsp + total_tfsa + cur_k_nrg) || 1;
