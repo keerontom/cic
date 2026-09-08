@@ -1383,6 +1383,30 @@ function calculate() {
     document.getElementById("res-additions").textContent = fmt(totAdd);
     document.getElementById("res-interest").textContent  = fmt(totInt);
         document.getElementById("res-ending").textContent = fmt(bal);
+    var finalWdrLbl = document.getElementById("res-final-wdr-label");
+    var finalWdrVal = document.getElementById("res-final-wdr");
+    var ledgerFRow  = document.getElementById("ledger-final-wdr-row");
+    var ledgerFLbl  = document.getElementById("ledger-final-wdr-label");
+    var ledgerFVal  = document.getElementById("ledger-final-wdr-val");
+
+    if (addSign === -1 && inflAdj && inflation > 0 && t > 0) {
+        var finalMo  = rawNum(document.getElementById("addition").value)
+                       * Math.pow(1 + inflation, t - 1);
+        var finalStr = fmt(finalMo) + "/mo";
+        var finalLbl = "Final yr withdrawal (CPI adj) @ " + inflPct + "%";
+        finalWdrLbl.textContent = finalLbl;
+        finalWdrVal.textContent = finalStr;
+        ledgerFRow.classList.remove("hidden");
+        ledgerFLbl.textContent = "\u21b3 " + finalLbl;
+        ledgerFVal.textContent = finalStr;
+    } else {
+        finalWdrLbl.textContent = "";
+        finalWdrVal.textContent = "";
+        ledgerFRow.classList.add("hidden");
+        ledgerFLbl.textContent = "";
+        ledgerFVal.textContent = "";
+    }
+
     document.getElementById("res-real-label").textContent =
         inflation > 0 ? "Real Value (today\u2019s $) @ "+inflPct+"% inflation" : "";
     document.getElementById("res-real").textContent =
@@ -1393,32 +1417,6 @@ function calculate() {
     document.getElementById("ledger-foot").innerHTML =
         '<tr><td>Total</td><td class="center-col">'+fmt(totAdd+totInt)+
         '</td><td class="right-col">'+fmt(bal)+'</td></tr>';
-        /* Final CPI-adjusted withdrawal — only on withdrawal phases with ADJ ON */
-    var finalWdrLbl = document.getElementById("res-final-wdr-label");
-    var finalWdrVal = document.getElementById("res-final-wdr");
-    var ledgerFRow  = document.getElementById("ledger-final-wdr-row");
-    var ledgerFLbl  = document.getElementById("ledger-final-wdr-label");
-    var ledgerFVal  = document.getElementById("ledger-final-wdr-val");
-    if (addSign === -1 && inflAdj && inflation > 0 && t > 0) {
-        var finalMo = rawNum(document.getElementById("addition").value)
-                      * Math.pow(1 + inflation, t - 1);
-        var finalStr = fmt(finalMo) + "/mo";
-        var finalLbl = "Final yr withdrawal (CPI adj) @ " + inflPct + "%";
-        /* Results card */
-        finalWdrLbl.textContent = finalLbl;
-        finalWdrVal.textContent = finalStr;
-        /* Ledger footer */
-        ledgerFRow.classList.remove("hidden");
-        ledgerFLbl.textContent = "↳ " + finalLbl;
-        ledgerFVal.textContent = finalStr;
-    } else {
-        finalWdrLbl.textContent = "";
-        finalWdrVal.textContent = "";
-        ledgerFRow.classList.add("hidden");
-        ledgerFLbl.textContent = "";
-        ledgerFVal.textContent = "";
-    }
-
     /* Income offset rows */
     var incRow = document.getElementById("res-income-row");
     var netRow = document.getElementById("res-net-draw-row");
