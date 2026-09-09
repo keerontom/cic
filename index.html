@@ -1222,7 +1222,28 @@ function carryForward(fromScenario, toScenario) {
         scenarioData[toScenario].port_e_rrsp =
             Math.round(e_r * sf).toLocaleString("en-CA");
     }
+/* ── NEW: CPI-inflate QPP and OAS from source phase ──
+       QPP and OAS are indexed by law — carry their end-of-phase value forward.
+       Pension is flat — do not inflate it. */
+    var pd       = scenarioData[fromScenario];
+    var cf_infl  = (parseFloat(pd.inflation)||0) / 100;
+    var cf_dur   = parseInt(pd.duration) || 0;
+    var cpi_grow = Math.pow(1 + cf_infl, cf_dur);
+
+    var src_qpp = rawNum(pd.qpp);
+    var src_oas = rawNum(pd.oas);
+
+    if (src_qpp > 0) {
+        scenarioData[toScenario].qpp =
+            (src_qpp * cpi_grow).toFixed(2);
+    }
+    if (src_oas > 0) {
+        scenarioData[toScenario].oas =
+            (src_oas * cpi_grow).toFixed(2);
+    }
+    /* pension: intentionally left untouched — not indexed */
 }
+
 /* ── CASCADE SWITCH — handles any skip distance ── */
 function switchScenario(newScenario) {
     if (newScenario === activeScenario) return;
