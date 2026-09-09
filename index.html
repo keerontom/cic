@@ -1393,7 +1393,7 @@ function calculate() {
         var finalMo = rawNum(document.getElementById("addition").value)
               * Math.pow(1 + inflation, t);
         var finalStr = fmt(finalMo) + "/mo";
-        var finalLbl = "Last withdrawal of final yr (CPI adj) @ " + inflPct + "%";
+        var finalLbl = "Last withdrawal of final year (CPI adj) @ " + inflPct + "%";
         if (finalWdrLbl) finalWdrLbl.textContent = finalLbl;
         if (finalWdrVal) finalWdrVal.textContent = finalStr;
         if (ledgerFRow)  ledgerFRow.classList.remove("hidden");
