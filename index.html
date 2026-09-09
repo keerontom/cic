@@ -1390,10 +1390,10 @@ function calculate() {
     var ledgerFVal  = document.getElementById("ledger-final-wdr-val");
 
     if (addSign === -1 && inflAdj && inflation > 0 && t > 0) {
-        var finalMo  = rawNum(document.getElementById("addition").value)
-                       * Math.pow(1 + inflation, t - 1);
+        var finalMo = rawNum(document.getElementById("addition").value)
+              * Math.pow(1 + inflation, t);
         var finalStr = fmt(finalMo) + "/mo";
-        var finalLbl = "Final yr withdrawal (CPI adj) @ " + inflPct + "%";
+        var finalLbl = "Last withdrawal of final yr (CPI adj) @ " + inflPct + "%";
         if (finalWdrLbl) finalWdrLbl.textContent = finalLbl;
         if (finalWdrVal) finalWdrVal.textContent = finalStr;
         if (ledgerFRow)  ledgerFRow.classList.remove("hidden");
