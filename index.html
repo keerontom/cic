@@ -1394,19 +1394,18 @@ function calculate() {
                        * Math.pow(1 + inflation, t - 1);
         var finalStr = fmt(finalMo) + "/mo";
         var finalLbl = "Final yr withdrawal (CPI adj) @ " + inflPct + "%";
-        finalWdrLbl.textContent = finalLbl;
-        finalWdrVal.textContent = finalStr;
-        ledgerFRow.classList.remove("hidden");
-        ledgerFLbl.textContent = "\u21b3 " + finalLbl;
-        ledgerFVal.textContent = finalStr;
+        if (finalWdrLbl) finalWdrLbl.textContent = finalLbl;
+        if (finalWdrVal) finalWdrVal.textContent = finalStr;
+        if (ledgerFRow)  ledgerFRow.classList.remove("hidden");
+        if (ledgerFLbl)  ledgerFLbl.textContent = "\u21b3 " + finalLbl;
+        if (ledgerFVal)  ledgerFVal.textContent = finalStr;
     } else {
-        finalWdrLbl.textContent = "";
-        finalWdrVal.textContent = "";
-        ledgerFRow.classList.add("hidden");
-        ledgerFLbl.textContent = "";
-        ledgerFVal.textContent = "";
+        if (finalWdrLbl) finalWdrLbl.textContent = "";
+        if (finalWdrVal) finalWdrVal.textContent = "";
+        if (ledgerFRow)  ledgerFRow.classList.add("hidden");
+        if (ledgerFLbl)  ledgerFLbl.textContent = "";
+        if (ledgerFVal)  ledgerFVal.textContent = "";
     }
-
     document.getElementById("res-real-label").textContent =
         inflation > 0 ? "Real Value (today\u2019s $) @ "+inflPct+"% inflation" : "";
     document.getElementById("res-real").textContent =
