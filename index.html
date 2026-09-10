@@ -1440,13 +1440,10 @@ function calculate() {
     var ledgerFLbl  = document.getElementById("ledger-final-wdr-label");
     var ledgerFVal  = document.getElementById("ledger-final-wdr-val");
     if (addSign === -1 && t > 0) {
-        var grossEnd    = rawNum(document.getElementById("addition").value)
-                          * Math.pow(1 + inflation, t);
-        var qppOasEnd   = qppOasMo * Math.pow(1 + inflation, t); /* indexed */
-        var pensionFlat = pensionMo;                               /* flat */
-        var finalMo     = Math.max(0, grossEnd - qppOasEnd - pensionFlat);
+      var finalMo = rawNum(document.getElementById("addition").value)
+              * Math.pow(1 + inflation, t);
         var finalStr    = fmt(finalMo) + "/mo";
-        var finalLbl    = "Last net draw on savings (CPI adj) @ " + inflPct + "%";
+        var finalLbl = "Next phase starting withdrawal (CPI adj) @ " + inflPct + "%";
         if (finalWdrLbl) finalWdrLbl.textContent = finalLbl;
         if (finalWdrVal) finalWdrVal.textContent  = finalStr;
         if (ledgerFRow)  ledgerFRow.classList.remove("hidden");
