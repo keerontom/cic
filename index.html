@@ -825,6 +825,15 @@ function toggleTaxDetails() {
         document.getElementById(id).classList.toggle("hidden", !taxDetailsOpen);
     });
 }
+    function openTaxDetails() {
+    taxDetailsOpen = true;
+    var ch = document.getElementById("tax-details-chevron");
+    if (ch) ch.classList.add("open");
+    ["res-tax-withdrawal-row","res-tax-owing-row",
+     "res-tax-rate-row","res-tax-keeron-row","res-tax-erin-row"].forEach(function(id){
+        document.getElementById(id).classList.remove("hidden");
+    });
+}
 function closeTaxDetails() {
     taxDetailsOpen = false;
     var ch = document.getElementById("tax-details-chevron");
@@ -1165,7 +1174,11 @@ function loadScenarioData(scenario) {
         document.getElementById("cost-when-"+n).classList.toggle("hidden", !pu.enabled);
     }
     hideCostsBody();
-    closeTaxDetails();
+if (activeScenario === "working") {
+    closeTaxDetails();   /* contribution phase — no tax details */
+} else {
+    openTaxDetails();    /* withdrawal phases — open by default */
+}
     updateIncomeCardVisibility();
     updatePortfolioFields();
 }
